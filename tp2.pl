@@ -11,6 +11,7 @@ ejemplo(8, a(s1, [sf], [(s1, a, s2), (s2, a, s3), (s2, b, s3), (s3, a, s1), (s3,
 ejemplo(9, a(s1, [s1], [(s1, a, s2), (s2, b, s1)])).
 ejemplo(10, a(s1, [s10, s11], 
         [(s2, a, s3), (s4, a, s5), (s9, a, s10), (s5, d, s6), (s7, g, s8), (s15, g, s11), (s6, i, s7), (s13, l, s14), (s8, m, s9), (s12, o, s13), (s14, o, s15), (s1, p, s2), (s3, r, s4), (s2, r, s12), (s10, s, s11)])).
+ejemplo(11, a(s1, [s4], [(s1, a, s2), (s1, b, s3), (s2, b, s4), (s3, b, s4), (s1, c, s4)])).
 
 ejemploMalo(1, a(s1, [s2], [(s1, a, s1), (s1, b, s2), (s2, b, s2), (s2, a, s3)])). %s3 es un estado sin salida.
 ejemploMalo(2, a(s1, [sf], [(s1, a, s1), (sf, b, sf)])). %sf no es alcanzable.
@@ -36,23 +37,59 @@ desde(X, Y):-desde(X, Z),  Y is Z + 1.
 %%Predicados pedidos.
 
 % 1) %esDeterministico(+Automata)
-esDeterministico(_).
+
+hayTransicionRepetida(E1, Etiqueta, [(E1, Etiqueta, _)|_]).
+hayTransicionRepetida(E1, Etiqueta, [(Ex, _, _)|Ls]) :- E1 \= Ex, hayTransicionRepetida(E1, Etiqueta, Ls).
+
+transcionesDeterministicas([]).
+transcionesDeterministicas([(E1, Etiqueta, _)|Ls]) :- transcionesDeterministicas(Ls), not(hayTransicionRepetida(E1, Etiqueta, Ls)).
+
+esDeterministico(a(_,_,T)) :- transcionesDeterministicas(T).
 
 
 % 2) estados(+Automata, ?Estados)
-estados(_, _).
+listaEstadosPorTransicion([], []).
+listaEstadosPorTransicion([(S1, _, S2)|Ls], [S1,S2|Es]) :- listaEstadosPorTransicion(Ls, Es).
+
+estados(a(I, F, T), Ls) :- setof(X, (listaEstadosPorTransicion(T, Y1), append(F, Y1, Y2), append([I], Y2, Y3), member(X, Y3)), Ls).
 
 
 % 3)esCamino(+Automata, ?EstadoInicial, ?EstadoFinal, +Camino)
-esCamino(_, _, _, _).
+
+
+%hayTransicion(+T, +E1, +E2) Verdadero si hay una transicion
+hayTransicion([(E1, _, E2)|_], E1, E2) :- !.
+hayTransicion([(_, _, _)|Ls], E1, E2) :- hayTransicion(Ls, E1, E2).
+
+%Si hay ciclos, no funciona la reversibilidad
+esCamino(A, S, S, [S]) :- transicionesDe(A, T), hayTransicion(T, S, S).
+esCamino(A, S, F, [S,L2|Ls]) :- transicionesDe(A, T), hayTransicion(T, S, L2), esCamino(A, L2, F, [L2|Ls]).
+%esCamino(A, _, F, [L1,F]) :- transicionesDe(A, T), hayTransicion(T, L1, F), !.
 
 % 4) ¿el predicado anterior es o no reversible con respecto a Camino y por qué?
 % Responder aquí.
+% No es reversible
 
 % 5) caminoDeLongitud(+Automata, +N, -Camino, -Etiquetas, ?S1, ?S2)
-caminoDeLongitud(_, _, _, _, _, _).
+etiquetaTransicion([(E1, Et, E2)|_], E1, E2, Et) :- !.
+etiquetaTransicion([(_, _, _)|Ls], E1, E2, Et) :- etiquetaTransicion(Ls, E1, E2, Et).
+etiquetaTransicion([], _, _, _) :- fail.
+
+%Devuelve etiqueta y estado al que es posible moverse desde ese estado
+%transicionesPosibles(+T, +E1, -E2, -Et)
+transicionesPosibles([(E1, Et, E2)|_], E1, E2, Et).
+transicionesPosibles([(_, _, _)|Ls], E1, E2, Et) :- transicionesPosibles(Ls, E1, E2, Et).
+
+%Solo funciona para longitudes 1.
+caminoDeLongitud(_, 0, [], [], _, _).
+caminoDeLongitud(A, 1, [S,F], [E], S, F) :- transicionesDe(A, T), etiquetaTransicion(T, S, F, E).
+%Veo las maneras posibles de llegar
+caminoDeLongitud(A, N, [S,C|CS], [E|ES], S, F) :- transicionesDe(A, T), transicionesPosibles(T, S, C, E), DEC is N-1, caminoDeLongitud(A, DEC, [C|CS], [E|ES], C, F).
 
 % 6) alcanzable(+Automata, +Estado)
+%Posible solucion
+%alcanzable(A, E) :- inicialDe(A, I), estados(A, X), length(X, N), between(0, N, Y), caminoDeLongitud(A, Y, C, E, I, E).
+
 alcanzable(_, _).
 
 % 7) automataValido(+Automata)
