@@ -84,19 +84,19 @@ transicionesPosibles([(_, _, _)|Ls], E1, E2, Et) :- transicionesPosibles(Ls, E1,
 caminoDeLongitud(_, 1, [], [], _, _) :- !.
 %Para casos pares
 caminoDeLongitud(A, 2, [S,F], [E], S, F) :- transicionesDe(A, T), transicionesPosibles(T, S, F, E).
-%Para casos impares
+%Para casos impares, podría traer un problema el tema de indices
 caminoDeLongitud(A, 1, [S, F], [E], S, F) :- transicionesDe(A, T), transicionesPosibles(T, S, F, E).
 %Veo las maneras posibles de llegar
 %Que pasa si CS es [] y N != 2
-%Hay que decrementar de a 2, porque suponemos que S,C ya estan agregados a CS, pasamos C para poder ver si continua el camino
-%Problema de indices
-caminoDeLongitud(A, N, [S,C|CS], [E|ES], S, F) :- transicionesDe(A, T), DEC is N-2, transicionesPosibles(T, S, C, E), caminoDeLongitud(A, DEC, [C|CS], ES, C, F).
+%Hay que decrementar de a 2, porque suponemos que S,C ya estan agregados a CS
+%Esta todo medio emparchado pero parece andar
+%Hay que decir que DEC >= para que no entre acá con 1 y entre en un loop infinito
+%porque se pasaría N para los negativos y no tenemos un caso base para eso
+caminoDeLongitud(A, N, [S,C|CS], [E|ES], S, F) :- transicionesDe(A, T), DEC is N-2, DEC >= 0, transicionesPosibles(T, S, C, E), caminoDeLongitud(A, DEC, [C|CS], ES, C, F).
 
 % 6) alcanzable(+Automata, +Estado)
 %Posible solucion
-%alcanzable(A, E) :- inicialDe(A, I), estados(A, X), length(X, N), between(0, N, Y), caminoDeLongitud(A, Y, C, E, I, E).
-
-alcanzable(_, _).
+alcanzable(A, E) :- inicialDe(A, I), estados(A, X), length(X, N), between(2, N, Y), caminoDeLongitud(A, Y, _, _, I, E), !.
 
 % 7) automataValido(+Automata)
 automataValido(_).
