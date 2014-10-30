@@ -93,10 +93,18 @@ caminoDeLongitud(A, N, [S,C|CS], [E|ES], S, F) :- transicionesDe(A, T), DEC is N
 alcanzable(A, E) :- inicialDe(A, I), estados(A, X), length(X, N), between(2, N, Y), caminoDeLongitud(A, Y, _, _, I, E), !.
 
 % 7) automataValido(+Automata)
+noTieneRepetidos([T1|Ts]) :- forall(member(T2, TS), T1 \= T2), noTieneRepetidos(TS)).
+
 todosLosEstadosAlcanzablesDesdeInicial(A) :- estados(A, ES), forall(member(E, ES), alcanzable(A, E)).
 tieneAlgunEstadoFinal(A) :- finalesDe(A, F), length(F, X), X >= 1.
+noTieneTransicionesRepetidas(A) :- transicionesDe(A, T), noTieneRepetidos(T).
+noTieneFinalesRepetidos(A) :- finales(A, F), noTieneRepetidos(F).
 
-automataValido(_).
+%Falta que todos los estados tengan salientes
+automataValido(A) :- todosLosEstadosAlcanzablesDesdeInicial(A),
+tieneAlgunEstadoFinal(A),
+noTieneTransicionesRepetidas(A),
+noTieneFinalesRepetidos(A).
 
 %--- NOTA: De acá en adelante se asume que los autómatas son válidos.
 
