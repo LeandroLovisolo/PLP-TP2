@@ -105,7 +105,8 @@ automataValido(_).
 
 
 % 8) hayCiclo(+Automata)
-hayCiclo(_).
+%Corto porque al encontrar un camino que sale y entra del mismo nodo, ya hay un ciclo.
+hayCiclo(A) :- estados(A, E), length(E, LE), member(J, E), LB is LE+1, between(2, LB, LC), caminoDeLongitud(A, LC, _, _, J, J), !.
 
 % 9) reconoce(+Automata, ?Palabra)
 reconoce(_, _).
