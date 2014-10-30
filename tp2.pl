@@ -37,17 +37,15 @@ desde(X, Y):-desde(X, Z),  Y is Z + 1.
 %%Predicados pedidos.
 
 % 1) %esDeterministico(+Automata)
+%transcionesSonDeterministicas(+Transiciones)
+transcionesSonDeterministicas([]).
+transcionesSonDeterministicas([(E1, Etiqueta, _)|Ls]) :- forall(member(L, Ls), L \= (E1, Etiqueta, _)), transcionesDeterministicas(Ls).
 
-hayTransicionRepetida(E1, Etiqueta, [(E1, Etiqueta, _)|_]).
-hayTransicionRepetida(E1, Etiqueta, [(Ex, _, _)|Ls]) :- E1 \= Ex, hayTransicionRepetida(E1, Etiqueta, Ls).
-
-transcionesDeterministicas([]).
-transcionesDeterministicas([(E1, Etiqueta, _)|Ls]) :- transcionesDeterministicas(Ls), not(hayTransicionRepetida(E1, Etiqueta, Ls)).
-
-esDeterministico(a(_,_,T)) :- transcionesDeterministicas(T).
+esDeterministico(A) :- transicionesDe(A, T), transcionesDeterministicas(T).
 
 
 % 2) estados(+Automata, ?Estados)
+%listaEstadosPorTransicion(+Automata, ?Estados)
 listaEstadosPorTransicion([], []).
 listaEstadosPorTransicion([(S1, _, S2)|Ls], [S1,S2|Es]) :- listaEstadosPorTransicion(Ls, Es).
 
@@ -55,7 +53,6 @@ estados(a(I, F, T), Ls) :- setof(X, (listaEstadosPorTransicion(T, Y1), append(F,
 
 
 % 3)esCamino(+Automata, ?EstadoInicial, ?EstadoFinal, +Camino)
-
 
 %hayTransicion(+T, +E1, +E2) Verdadero si hay una transicion
 hayTransicion([(E1, _, E2)|_], E1, E2) :- !.
@@ -71,9 +68,6 @@ esCamino(A, S, F, [S,L2|Ls]) :- transicionesDe(A, T), hayTransicion(T, S, L2), e
 % No es reversible
 
 % 5) caminoDeLongitud(+Automata, +N, -Camino, -Etiquetas, ?S1, ?S2)
-etiquetaTransicion([(E1, Et, E2)|_], E1, E2, Et) :- !.
-etiquetaTransicion([(_, _, _)|Ls], E1, E2, Et) :- etiquetaTransicion(Ls, E1, E2, Et).
-etiquetaTransicion([], _, _, _) :- fail.
 
 %Devuelve etiqueta y estado al que es posible moverse desde ese estado
 %transicionesPosibles(+T, +E1, -E2, -Et)
@@ -99,6 +93,9 @@ caminoDeLongitud(A, N, [S,C|CS], [E|ES], S, F) :- transicionesDe(A, T), DEC is N
 alcanzable(A, E) :- inicialDe(A, I), estados(A, X), length(X, N), between(2, N, Y), caminoDeLongitud(A, Y, _, _, I, E), !.
 
 % 7) automataValido(+Automata)
+todosLosEstadosAlcanzablesDesdeInicial(A) :- estados(A, ES), forall(member(E, ES), alcanzable(A, E)).
+tieneAlgunEstadoFinal(A) :- finalesDe(A, F), length(F, X), X >= 1.
+
 automataValido(_).
 
 %--- NOTA: De acá en adelante se asume que los autómatas son válidos.
@@ -109,10 +106,19 @@ automataValido(_).
 hayCiclo(A) :- estados(A, E), length(E, LE), member(J, E), LB is LE+1, between(2, LB, LC), caminoDeLongitud(A, LC, _, _, J, J), !.
 
 % 9) reconoce(+Automata, ?Palabra)
-reconoce(_, _).
+%Problema, como identificar que pare al no encontrar mas caminos
+%El redo no es solamente por regla no? es por llamada a funcion
+
+%Reconoce para listas de 1 elemento
+reconoce(A, [P]) :- inicialDe(A,I), finalesDe(A,F), member(I, F), P = I.
+%Si esta instanciada o semi instanciada, busco el camino de la misma longitud
+%reconoce(A, P) :- nonvar(P), inicialDe(A,I), finalesDe(A,F), member(Fm ,F), length(P, LP), caminoDeLongitud(A, Y, _, P, I, Fm).
+%Si no esta instanciada, devuelve todas las palabras que puede reconocer (Ver como parar igual si ya no hay de mayor longitud por reconocer)
+reconoce(A, P) :- inicialDe(A,I), finalesDe(A,F), member(Fm ,F), alcanzable(A, Fm), desde(1, Y), caminoDeLongitud(A, Y, _, P, I, Fm).
 
 % 10) PalabraMásCorta(+Automata, ?Palabra)
-palabraMasCorta(_, _).
+%La primera vez que reconozca una palabra, tira los resultados posibles para esa palabra
+palabraMasCorta(A, P) :- desde(1, Y), length(P, Y), reconoce(A, P), !, reconoce(A,P), length(P, Y).
 
 %-----------------
 %----- Tests -----
