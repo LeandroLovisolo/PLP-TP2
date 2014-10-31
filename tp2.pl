@@ -121,8 +121,11 @@ hayCiclo(A) :- estados(A, E), length(E, LE), member(J, E), LB is LE*2, between(2
 reconoce(A, P) :- not(hayCiclo(A)), !, ground(P), inicialDe(A,I), finalesDe(A,F),
 	estados(A, E), length(E, LE), CM is 2*LE, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm), !.
 
+reconoce(A, P) :- not(hayCiclo(A)), !, nonvar(P), inicialDe(A,I), finalesDe(A,F),
+	estados(A, E), length(E, LE), CM is 2*LE, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm).
+
 %No hay ciclo y no está definido P
-reconoce(A, P) :- not(hayCiclo(A)), !, not(ground(P)), inicialDe(A, I), finalesDe(A, F),
+reconoce(A, P) :- not(hayCiclo(A)), !, not(nonvar(P)), inicialDe(A, I), finalesDe(A, F),
 	estados(A, E), length(E, LE), CM is 2*LE, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm).
 
 %Separo en los casos de P definida y P no definida porque en el caso de que este definida, encuentra un valor y debería parar,
@@ -136,7 +139,12 @@ reconoce(A, P) :- not(hayCiclo(A)), !, not(ground(P)), inicialDe(A, I), finalesD
 %Habria que ver si semi definido solo incluye listas de longitud finita
 %Si esta semi-definido, tiene una longitud finita, aunque tenga un ciclo, debería devolver todos los resultados para el caso que este semi definida
 
-%Ver por que devuelve mas de un resultado igual (Tests dan false porque esta devolviendo mas de uno igual)
+%Divido entre sin ciclos no definido, semi-definido y definido
+%Si esta totalmente definido, quiero un solo resultado
+reconoce(A, P) :- hayCiclo(A), ground(P), inicialDe(A, I), finalesDe(A, F),
+	length(P, Y), CM is Y*2, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm), !.
+
+%Si esta semi definido, quiero los resultados posibles (pueden haber repetidos, ojo)
 reconoce(A, P) :- hayCiclo(A), nonvar(P), inicialDe(A, I), finalesDe(A, F),
 	length(P, Y), CM is Y*2, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm).
 
@@ -148,7 +156,8 @@ reconoce(A, P) :- hayCiclo(A), not(nonvar(P)), inicialDe(A, I), finalesDe(A, F),
 
 % 10) PalabraMásCorta(+Automata, ?Palabra)
 %La primera vez que reconozca una palabra, tira los resultados posibles para esa palabra
-palabraMasCorta(A, P) :- desde(1, Y), length(P, Y), reconoce(A, P), !, reconoce(A,P), length(P, Y).
+%Parece que el redo hace las cosas 4 veces. Hay resultados repetidos
+palabraMasCorta(A, P) :- desde(1, Y), length(P, Y), length(X, Y), reconoce(A, X), !, reconoce(A, P).
 
 %-----------------
 %----- Tests -----
