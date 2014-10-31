@@ -39,9 +39,9 @@ desde(X, Y):-desde(X, Z),  Y is Z + 1.
 % 1) %esDeterministico(+Automata)
 %transcionesSonDeterministicas(+Transiciones)
 transcionesSonDeterministicas([]).
-transcionesSonDeterministicas([(E1, Etiqueta, _)|Ls]) :- forall(member(L, Ls), L \= (E1, Etiqueta, _)), transcionesDeterministicas(Ls).
+transcionesSonDeterministicas([(E1, Etiqueta, _)|Ls]) :- forall(member(L, Ls), L \= (E1, Etiqueta, _)), transcionesSonDeterministicas(Ls).
 
-esDeterministico(A) :- transicionesDe(A, T), transcionesDeterministicas(T).
+esDeterministico(A) :- transicionesDe(A, T), transcionesSonDeterministicas(T).
 
 
 % 2) estados(+Automata, ?Estados)
@@ -98,7 +98,7 @@ noTieneRepetidos([T1|TS]) :- forall(member(T2, TS), T1 \= T2), noTieneRepetidos(
 todosLosEstadosAlcanzablesDesdeInicial(A) :- estados(A, ES), forall(member(E, ES), alcanzable(A, E)).
 tieneAlgunEstadoFinal(A) :- finalesDe(A, F), length(F, X), X >= 1.
 noTieneTransicionesRepetidas(A) :- transicionesDe(A, T), noTieneRepetidos(T).
-noTieneFinalesRepetidos(A) :- finales(A, F), noTieneRepetidos(F).
+noTieneFinalesRepetidos(A) :- finalesDe(A, F), noTieneRepetidos(F).
 
 %Falta que todos los estados tengan salientes
 automataValido(A) :- todosLosEstadosAlcanzablesDesdeInicial(A),
