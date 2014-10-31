@@ -90,10 +90,10 @@ caminoDeLongitud(A, N, [S,C|CS], [E|ES], S, F) :- transicionesDe(A, T), DEC is N
 
 % 6) alcanzable(+Automata, +Estado)
 %Posible solucion
-alcanzable(A, E) :- inicialDe(A, I), estados(A, X), length(X, N), between(2, N, Y), caminoDeLongitud(A, Y, _, _, I, E), !.
+alcanzable(A, E) :- inicialDe(A, I), estados(A, X), length(X, N), CM = 2*N, between(2, CM, Y), caminoDeLongitud(A, Y, _, _, I, E), !.
 
 % 7) automataValido(+Automata)
-noTieneRepetidos([T1|Ts]) :- forall(member(T2, TS), T1 \= T2), noTieneRepetidos(TS)).
+noTieneRepetidos([T1|TS]) :- forall(member(T2, TS), T1 \= T2), noTieneRepetidos(TS).
 
 todosLosEstadosAlcanzablesDesdeInicial(A) :- estados(A, ES), forall(member(E, ES), alcanzable(A, E)).
 tieneAlgunEstadoFinal(A) :- finalesDe(A, F), length(F, X), X >= 1.
@@ -118,11 +118,25 @@ hayCiclo(A) :- estados(A, E), length(E, LE), member(J, E), LB is LE+1, between(2
 %El redo no es solamente por regla no? es por llamada a funcion
 
 %Reconoce para listas de 1 elemento
+%Re checkar esto
 reconoce(A, [P]) :- inicialDe(A,I), finalesDe(A,F), member(I, F), P = I.
-%Si esta instanciada o semi instanciada, busco el camino de la misma longitud
-%reconoce(A, P) :- nonvar(P), inicialDe(A,I), finalesDe(A,F), member(Fm ,F), length(P, LP), caminoDeLongitud(A, Y, _, P, I, Fm).
-%Si no esta instanciada, devuelve todas las palabras que puede reconocer (Ver como parar igual si ya no hay de mayor longitud por reconocer)
-reconoce(A, P) :- inicialDe(A,I), finalesDe(A,F), member(Fm ,F), alcanzable(A, Fm), desde(1, Y), caminoDeLongitud(A, Y, _, P, I, Fm).
+%Si no hay ciclo, busco entre todos los caminos posibles que empiecen en un inicial y terminen en un final
+%Y unifiquen con P
+%Uso CM = 2 * cantidad de estados, porque para transicionar a un estado se necesita un camino de al menos 2
+reconoce(A, P) :- not(hayCiclo(A)), !, inicialDe(A,I), finalesDe(A,F),
+	estados(A, E), length(E, LE), CM is 2*LE, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm), !.
+
+%Separo en los casos de P definida y P no definida porque en el caso de que este definida, encuentra un valor y debería parar,
+%no puede seguir generando otros valores porque P como está definido deja de unificar.
+%En cambio, si no tengo P definida, debería dar todos los posibles.
+
+%Si hay un ciclo y está definido P, encuentra 1 solucion y devuelve que lo reconocio
+reconoce(A, P) :- hayCiclo(A), ground(P), inicialDe(A, I), finalesDe(A, F),
+	desde(1, Y), member(Fm, F), caminoDeLongitud(A, Y, _, P, I, Fm), !.
+
+%Si hay un ciclo y no está definido P, devuelvo todas las soluciones que pueda reonocer
+reconoce(A, P) :- hayCiclo(A), not(ground(P)), inicialDe(A, I), finalesDe(A, F),
+	desde(1, Y), member(Fm, F), caminoDeLongitud(A, Y, _, P, I, Fm).
 
 % 10) PalabraMásCorta(+Automata, ?Palabra)
 %La primera vez que reconozca una palabra, tira los resultados posibles para esa palabra
