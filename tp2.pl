@@ -60,9 +60,8 @@ hayTransicion([(_, _, _)|Ls], E1, E2) :- hayTransicion(Ls, E1, E2).
 
 %Si hay ciclos, no funciona la reversibilidad
 esCamino(A, S, S, [S]) :- transicionesDe(A, T), hayTransicion(T, S, S).
-esCamino(A, S, F, [S, F]) :- transicionesDe(A, T), hayTransicion(T, S, F).
+esCamino(A, S, F, [S,F]) :- transicionesDe(A, T), hayTransicion(T, S, F), !.
 esCamino(A, S, F, [S,L2|Ls]) :- transicionesDe(A, T), hayTransicion(T, S, L2), esCamino(A, L2, F, [L2|Ls]).
-%esCamino(A, _, F, [L1,F]) :- transicionesDe(A, T), hayTransicion(T, L1, F), !.
 
 % 4) ¿el predicado anterior es o no reversible con respecto a Camino y por qué?
 % Responder aquí.
