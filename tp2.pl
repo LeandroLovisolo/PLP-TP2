@@ -36,23 +36,29 @@ desde(X, Y):-desde(X, Z),  Y is Z + 1.
 
 %%Predicados pedidos.
 
-% 1) %esDeterministico(+Automata)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 1) %esDeterministico(+Automata)                                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %transcionesSonDeterministicas(+Transiciones)
 transcionesSonDeterministicas([]).
 transcionesSonDeterministicas([(E1, Etiqueta, _)|Ls]) :- forall(member(L, Ls), L \= (E1, Etiqueta, _)), transcionesSonDeterministicas(Ls).
 
 esDeterministico(A) :- transicionesDe(A, T), transcionesSonDeterministicas(T).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 2) estados(+Automata, ?Estados)                                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% 2) estados(+Automata, ?Estados)
 %listaEstadosPorTransicion(+Automata, ?Estados)
 listaEstadosPorTransicion([], []).
 listaEstadosPorTransicion([(S1, _, S2)|Ls], [S1,S2|Es]) :- listaEstadosPorTransicion(Ls, Es).
 
 estados(a(I, F, T), Ls) :- setof(X, (listaEstadosPorTransicion(T, Y1), append(F, Y1, Y2), append([I], Y2, Y3), member(X, Y3)), Ls).
 
-
-% 3)esCamino(+Automata, ?EstadoInicial, ?EstadoFinal, +Camino)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 3)esCamino(+Automata, ?EstadoInicial, ?EstadoFinal, +Camino)                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %hayTransicion(+T, +E1, +E2) Verdadero si hay una transicion
 hayTransicion([(E1, _, E2)|_], E1, E2) :- !.
@@ -63,11 +69,16 @@ esCamino(A, S, S, [S]) :- transicionesDe(A, T), hayTransicion(T, S, S).
 esCamino(A, S, F, [S,F]) :- transicionesDe(A, T), hayTransicion(T, S, F), !.
 esCamino(A, S, F, [S,L2|Ls]) :- transicionesDe(A, T), hayTransicion(T, S, L2), esCamino(A, L2, F, [L2|Ls]).
 
-% 4) ¿el predicado anterior es o no reversible con respecto a Camino y por qué?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 4) ¿el predicado anterior es o no reversible con respecto a Camino y por qué?%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % Responder aquí.
 % No es reversible
 
-% 5) caminoDeLongitud(+Automata, +N, -Camino, -Etiquetas, ?S1, ?S2)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 5) caminoDeLongitud(+Automata, +N, -Camino, -Etiquetas, ?S1, ?S2)            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Devuelve etiqueta y estado al que es posible moverse desde ese estado
 %transicionesPosibles(+T, +E1, -E2, -Et)
@@ -88,11 +99,17 @@ caminoDeLongitud(A, 1, [S, F], [E], S, F) :- transicionesDe(A, T), transicionesP
 %porque se pasaría N para los negativos y no tenemos un caso base para eso
 caminoDeLongitud(A, N, [S,C|CS], [E|ES], S, F) :- transicionesDe(A, T), DEC is N-2, DEC >= 0, transicionesPosibles(T, S, C, E), caminoDeLongitud(A, DEC, [C|CS], ES, C, F).
 
-% 6) alcanzable(+Automata, +Estado)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 6) alcanzable(+Automata, +Estado)                                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %Posible solucion
 alcanzable(A, E) :- inicialDe(A, I), estados(A, X), length(X, N), CM = 2*N, between(2, CM, Y), caminoDeLongitud(A, Y, _, _, I, E), !.
 
-% 7) automataValido(+Automata)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 7) automataValido(+Automata)                                                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 noTieneRepetidos([T1|TS]) :- forall(member(T2, TS), T1 \= T2), noTieneRepetidos(TS).
 
 todosLosEstadosAlcanzablesDesdeInicial(A) :- estados(A, ES), forall(member(E, ES), alcanzable(A, E)).
@@ -109,11 +126,16 @@ noTieneFinalesRepetidos(A).
 %--- NOTA: De acá en adelante se asume que los autómatas son válidos.
 
 
-% 8) hayCiclo(+Automata)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 8) hayCiclo(+Automata)                                                       %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %Corto porque al encontrar un camino que sale y entra del mismo nodo, ya hay un ciclo.
 hayCiclo(A) :- estados(A, E), length(E, LE), member(J, E), LB is LE*2, between(2, LB, LC), caminoDeLongitud(A, LC, _, _, J, J), !.
 
-% 9) reconoce(+Automata, ?Palabra)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 9) reconoce(+Automata, ?Palabra)                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Si no hay ciclo, busco entre todos los caminos posibles que empiecen en un inicial y terminen en un final
 %Y unifiquen con P
@@ -152,9 +174,10 @@ reconoce(A, P) :- hayCiclo(A), nonvar(P), inicialDe(A, I), finalesDe(A, F),
 reconoce(A, P) :- hayCiclo(A), not(nonvar(P)), inicialDe(A, I), finalesDe(A, F),
 	desde(1, Y), member(Fm, F), caminoDeLongitud(A, Y, _, P, I, Fm).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 10) PalabraMásCorta(+Automata, ?Palabra)                                     %  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-% 10) PalabraMásCorta(+Automata, ?Palabra)
 %La primera vez que reconozca una palabra, tira los resultados posibles para esa palabra
 %Parece que el redo hace las cosas 4 veces. Hay resultados repetidos
 palabraMasCorta(A, P) :- desde(1, Y), length(P, Y), length(X, Y), reconoce(A, X), !, reconoce(A, P).
