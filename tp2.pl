@@ -42,7 +42,9 @@ desde(X, Y):-desde(X, Z),  Y is Z + 1.
 
 %transcionesSonDeterministicas(+Transiciones)
 transcionesSonDeterministicas([]).
-transcionesSonDeterministicas([(E1, Etiqueta, _)|Ls]) :- forall(member(L, Ls), L \= (E1, Etiqueta, _)), transcionesSonDeterministicas(Ls).
+transcionesSonDeterministicas([(E1, Etiqueta, _)|Ls]) :- forall(member(L, Ls),
+                                                                L \= (E1, Etiqueta, _)),
+                                                         transcionesSonDeterministicas(Ls).
 
 esDeterministico(A) :- transicionesDe(A, T), transcionesSonDeterministicas(T).
 
