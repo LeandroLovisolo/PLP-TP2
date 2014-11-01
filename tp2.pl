@@ -114,7 +114,12 @@ caminoDeLongitud(A, N, [S1, S2 | Camino], [E | Etiquetas], S1, Sn) :- N >= 2,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Posible solucion
-alcanzable(A, E) :- inicialDe(A, I), estados(A, X), length(X, N), CM = 2*N, between(2, CM, Y), caminoDeLongitud(A, Y, _, _, I, E), !.
+alcanzable(A, E) :- inicialDe(A, I),
+                    estados(A, Estados),
+                    length(Estados, N),
+                    between(2, N, M),
+                    caminoDeLongitud(A, M, _, _, I, E),
+                    !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 7) automataValido(+Automata)                                                 %
