@@ -177,27 +177,51 @@ reconoce(A, Palabra) :- not(ground(Palabra)), reconoceUna(A, Palabra).
 
 %La primera vez que reconozca una palabra, tira los resultados posibles para esa palabra
 %Parece que el redo hace las cosas 4 veces. Hay resultados repetidos
-palabraMasCorta(A, P) :- desde(0, Y), length(P, Y), length(X, Y), reconoce(A, X), !, reconoce(A, P).
+palabraMasCorta(A, P) :- desde(0, Y),
+                         length(P, Y),
+                         length(X, Y),
+                         reconoce(A, X),
+                         !,
+                         reconoce(A, P).
+
+palabraMasCorta(A, P) :- desde(0, N),
+                         palabrasDeLongitudN(A, Palabras, N),
+                         Palabras \= [],
+                         !,
+                         member(P, Palabras).
+palabrasDeLongitudN(A, Palabras, N) :-
+        findall(P, (length(P, N), reconoce(A, P)), Palabras).
 
 %-----------------
 %----- Tests -----
 %-----------------
 
-% Algunos tests de ejemplo. Deben agregar los suyos.
+numeroDeTests(20).
+tests :- numeroDeTests(N), forall(between(1, N, I), test(I)). 
 
-test(1) :- forall(ejemplo(_, A),  automataValido(A)).
-test(2) :- not((ejemploMalo(_, A),  automataValido(A))).
-test(3) :- ejemplo(10, A), reconoce(A, [p, X, r, X, d, i, _, m, X, s]).
-test(4) :- ejemplo(9, A), reconoce(A, [a,  b,  a,  b,  a,  b,  a,  b]).
-test(5) :- ejemplo(7, A), reconoce(A, [a,  a,  a,  b,  b]).
-test(6) :- ejemplo(7, A), not(reconoce(A, [b])).
-test(7) :- ejemplo(2, A),  findall(P, palabraMasCorta(A, P), [[]]).
-test(8) :- ejemplo(4, A),  findall(P, palabraMasCorta(A, P), Lista), length(Lista, 2), sort(Lista, [[a], [b]]).
-test(9) :- ejemplo(5, A),  findall(P, palabraMasCorta(A, P), Lista), length(Lista, 2), sort(Lista, [[b], [c]]).
+% Tests provistos por la cátedra. 
+
+test(1)  :- forall(ejemplo(_, A),  automataValido(A)).
+test(2)  :- not((ejemploMalo(_, A),  automataValido(A))).
+test(3)  :- ejemplo(10, A), reconoce(A, [p, X, r, X, d, i, _, m, X, s]).
+test(4)  :- ejemplo(9, A), reconoce(A, [a,  b,  a,  b,  a,  b,  a,  b]).
+test(5)  :- ejemplo(7, A), reconoce(A, [a,  a,  a,  b,  b]).
+test(6)  :- ejemplo(7, A), not(reconoce(A, [b])).
+test(7)  :- ejemplo(2, A),  findall(P, palabraMasCorta(A, P), [[]]).
+test(8)  :- ejemplo(4, A),  findall(P, palabraMasCorta(A, P), Lista), length(Lista, 2), sort(Lista, [[a], [b]]).
+test(9)  :- ejemplo(5, A),  findall(P, palabraMasCorta(A, P), Lista), length(Lista, 2), sort(Lista, [[b], [c]]).
 test(10) :- ejemplo(6, A),  findall(P, palabraMasCorta(A, P), [[b, a]]).
 test(11) :- ejemplo(7, A),  findall(P, palabraMasCorta(A, P), [[a, b]]).
 test(12) :- ejemplo(8, A),  findall(P, palabraMasCorta(A, P), Lista), length(Lista, 2), sort(Lista, [[a,  a,  b,  f], [a,  b,  b,  f]]).
 test(13) :- ejemplo(10, A),  findall(P, palabraMasCorta(A, P), [[p, r, o, l, o, g]]).
 test(14) :- forall(member(X, [2, 4, 5, 6, 7, 8, 9]), (ejemplo(X, A), hayCiclo(A))).
 test(15) :- not((member(X, [1, 3, 10]), ejemplo(X, A), hayCiclo(A))).
-tests :- forall(between(1, 15, N), test(N)). %IMPORTANTE: Actualizar la cantidad total de tests para contemplar los que agreguen ustedes.
+
+% Tests propios.
+
+% Ejercicio 1
+test(16) :- ejemplo(1, A), esDeterministico(A).
+test(17) :- ejemplo(2, A), esDeterministico(A).
+test(18) :- ejemplo(3, A), esDeterministico(A).
+test(19) :- ejemplo(4, A), not(esDeterministico(A)).
+test(20) :- ejemplo(5, A), esDeterministico(A).
