@@ -125,21 +125,38 @@ alcanzable(A, E) :- inicialDe(A, I),
 % 7) automataValido(+Automata)                                                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-noTieneRepetidos([T1|TS]) :- forall(member(T2, TS), T1 \= T2), noTieneRepetidos(TS).
+estadosNoFinales(A, EstadosNoFinales) :- estados(A, Estados),
+                                         finalesDe(A, EstadosFinales),
+                                         subtract(Estados, EstadosFinales, EstadosNoFinales).
 
-todosLosEstadosAlcanzablesDesdeInicial(A) :- estados(A, ES), forall(member(E, ES), alcanzable(A, E)).
-tieneAlgunEstadoFinal(A) :- finalesDe(A, F), length(F, X), X >= 1.
-noTieneTransicionesRepetidas(A) :- transicionesDe(A, T), noTieneRepetidos(T).
-noTieneFinalesRepetidos(A) :- finalesDe(A, F), noTieneRepetidos(F).
+todoEstadoNoFinalTieneTransicionesSalientes(A) :- estadosNoFinales(A, EstadosNoFinales),
+                                                  transicionesDe(A, T),                     
+                                                  forall(member(E, EstadosNoFinales),
+                                                         transicionesPosibles(T, E, _, _)).
 
-%Falta que todos los estados tengan salientes
-automataValido(A) :- todosLosEstadosAlcanzablesDesdeInicial(A),
-tieneAlgunEstadoFinal(A),
-noTieneTransicionesRepetidas(A),
-noTieneFinalesRepetidos(A).
+estadosNoIniciales(A, EstadosNoIniciales) :- estados(A, Estados),
+                                             inicialDe(A, Inicial),
+                                             subtract(Estados, [Inicial], EstadosNoIniciales).
+
+todoEstadoEsAlcanzableDesdeElInicial(A) :- estadosNoIniciales(A, EstadosNoIniciales),
+                                           forall(member(E, EstadosNoIniciales),
+                                                  alcanzable(A, E)).
+tieneEstadosFinales(A) :- finalesDe(A, Finales), Finales \= [].
+
+noTieneRepetidos([]).
+noTieneRepetidos([X | XS]) :- forall(member(Y, XS), X \= Y), noTieneRepetidos(XS).
+
+noHayEstadosFinalesRepetidos(A) :- finalesDe(A, F), noTieneRepetidos(F).
+
+noHayTransicionesRepetidas(A) :- transicionesDe(A, T), noTieneRepetidos(T).
+
+automataValido(A) :- todoEstadoNoFinalTieneTransicionesSalientes(A),
+                     todoEstadoEsAlcanzableDesdeElInicial(A),
+                     tieneEstadosFinales(A),
+                     noHayEstadosFinalesRepetidos(A),
+                     noHayTransicionesRepetidas(A).
 
 %--- NOTA: De acá en adelante se asume que los autómatas son válidos.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 8) hayCiclo(+Automata)                                                       %
