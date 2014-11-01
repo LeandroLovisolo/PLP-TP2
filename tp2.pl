@@ -82,8 +82,7 @@ esCamino(A, S, F, [S,L2|Ls]) :- transicionesDe(A, T), hayTransicion(T, S, L2), e
 
 %Devuelve etiqueta y estado al que es posible moverse desde ese estado
 %transicionesPosibles(+T, +E1, -E2, -Et)
-transicionesPosibles([(E1, Et, E2)|_], E1, E2, Et).
-transicionesPosibles([(_, _, _)|Ls], E1, E2, Et) :- transicionesPosibles(Ls, E1, E2, Et).
+transicionesPosibles(T, S1, S2, E) :- member((S1, E, S2), T).
 
 %Solo funciona para longitudes 1.
 %caminoDeLongitud(_, 1, [], [], _, _) :- !.
