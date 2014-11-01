@@ -84,23 +84,6 @@ esCamino(A, S, F, [S,L2|Ls]) :- transicionesDe(A, T), hayTransicion(T, S, L2), e
 %transicionesPosibles(+T, +E1, -E2, -Et)
 transicionesPosibles(T, S1, S2, E) :- member((S1, E, S2), T).
 
-%Solo funciona para longitudes 1.
-%caminoDeLongitud(_, 1, [], [], _, _) :- !.
-%Para casos pares
-%caminoDeLongitud(A, 2, [S,F], [E], S, F) :- transicionesDe(A, T), transicionesPosibles(T, S, F, E).
-%Para casos impares, podría traer un problema el tema de indices
-%caminoDeLongitud(A, 1, [S, F], [E], S, F) :- transicionesDe(A, T), transicionesPosibles(T, S, F, E).
-%Veo las maneras posibles de llegar
-%Que pasa si CS es [] y N != 2
-%Hay que decrementar de a 2, porque suponemos que S,C ya estan agregados a CS
-%Esta todo medio emparchado pero parece andar
-%Hay que decir que DEC >= para que no entre acá con 1 y entre en un loop infinito
-%porque se pasaría N para los negativos y no tenemos un caso base para eso
-%caminoDeLongitud(A, N, [S,C|CS], [E|ES], S, F) :- transicionesDe(A, T),
-%                                                  DEC is N-2, DEC >= 0,
-%                                                  transicionesPosibles(T, S, C, E),
-%                                                  caminoDeLongitud(A, DEC, [C|CS], ES, C, F).
-
 caminoDeLongitud(A, 1, [S], [], S, S) :- estados(A, E), member(S, E).
 caminoDeLongitud(A, N, [S1, S2 | Camino], [E | Etiquetas], S1, Sn) :- N >= 2,
                                                                       transicionesDe(A, T),
