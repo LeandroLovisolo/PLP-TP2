@@ -175,42 +175,19 @@ hayCiclo(A) :- estados(A, Estados),
 % 9) reconoce(+Automata, ?Palabra)                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Si no hay ciclo, busco entre todos los caminos posibles que empiecen en un inicial y terminen en un final
-%Y unifiquen con P
-%Uso CM = 2 * cantidad de estados, porque para transicionar a un estado se necesita un camino de al menos 2
-reconoce(A, P) :- not(hayCiclo(A)), !, ground(P), inicialDe(A,I), finalesDe(A,F),
-    estados(A, E), length(E, LE), CM is 2*LE, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm), !.
-
-reconoce(A, P) :- not(hayCiclo(A)), !, nonvar(P), inicialDe(A,I), finalesDe(A,F),
-    estados(A, E), length(E, LE), CM is 2*LE, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm).
-
-%No hay ciclo y no está definido P
-reconoce(A, P) :- not(hayCiclo(A)), !, not(nonvar(P)), inicialDe(A, I), finalesDe(A, F),
-    estados(A, E), length(E, LE), CM is 2*LE, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm).
-
-%Separo en los casos de P definida y P no definida porque en el caso de que este definida, encuentra un valor y debería parar,
-%no puede seguir generando otros valores porque P como está definido deja de unificar.
-%En cambio, si no tengo P definida, debería dar todos los posibles.
-
-
-%Har problema con los ciclos y las cosas semi definidas. Solamente debería dar resultados de todos los tamaños si está totalmente indefinida
-
-%Si hay un ciclo y está definido P (incluye semi definido), encuentra 1 solucion y devuelve que lo reconocio
-%Habria que ver si semi definido solo incluye listas de longitud finita
-%Si esta semi-definido, tiene una longitud finita, aunque tenga un ciclo, debería devolver todos los resultados para el caso que este semi definida
-
-%Divido entre sin ciclos no definido, semi-definido y definido
-%Si esta totalmente definido, quiero un solo resultado
-reconoce(A, P) :- hayCiclo(A), ground(P), inicialDe(A, I), finalesDe(A, F),
-    length(P, Y), CM is Y*2, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm), !.
-
-%Si esta semi definido, quiero los resultados posibles (pueden haber repetidos, ojo)
-reconoce(A, P) :- hayCiclo(A), nonvar(P), inicialDe(A, I), finalesDe(A, F),
-    length(P, Y), CM is Y*2, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm).
-
-%Si hay un ciclo y no está definido P (totalmente indefinido), devuelvo todas las soluciones que pueda reonocer
-reconoce(A, P) :- hayCiclo(A), not(nonvar(P)), inicialDe(A, I), finalesDe(A, F),
-    desde(1, Y), member(Fm, F), caminoDeLongitud(A, Y, _, P, I, Fm).
+longitudCamino(_, Palabra, N) :- nonvar(Palabra), length(Palabra, M), N is M + 1.
+longitudCamino(A, Palabra, N) :- var(Palabra), hayCiclo(A), desde(1, N).
+longitudCamino(A, Palabra, N) :- var(Palabra), not(hayCiclo(A)),
+                                 estados(A, Estados),
+                                 length(Estados, NE),
+                                 between(1, NE, N).
+reconoceUna(A, Palabra) :- inicialDe(A, Inicial),
+                           finalesDe(A, Finales),
+                           longitudCamino(A, Palabra, N),
+                           member(Final, Finales),
+                           caminoDeLongitud(A, N, _, Palabra, Inicial, Final).
+reconoce(A, Palabra) :- ground(Palabra), reconoceUna(A, Palabra), !.
+reconoce(A, Palabra) :- not(ground(Palabra)), reconoceUna(A, Palabra).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 10) PalabraMásCorta(+Automata, ?Palabra)                                     %  
