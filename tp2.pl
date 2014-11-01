@@ -177,7 +177,7 @@ reconoce(A, Palabra) :- not(ground(Palabra)), reconoceUna(A, Palabra).
 
 %La primera vez que reconozca una palabra, tira los resultados posibles para esa palabra
 %Parece que el redo hace las cosas 4 veces. Hay resultados repetidos
-palabraMasCorta(A, P) :- desde(1, Y), length(P, Y), length(X, Y), reconoce(A, X), !, reconoce(A, P).
+palabraMasCorta(A, P) :- desde(0, Y), length(P, Y), length(X, Y), reconoce(A, X), !, reconoce(A, P).
 
 %-----------------
 %----- Tests -----
