@@ -86,18 +86,28 @@ transicionesPosibles([(E1, Et, E2)|_], E1, E2, Et).
 transicionesPosibles([(_, _, _)|Ls], E1, E2, Et) :- transicionesPosibles(Ls, E1, E2, Et).
 
 %Solo funciona para longitudes 1.
-caminoDeLongitud(_, 1, [], [], _, _) :- !.
+%caminoDeLongitud(_, 1, [], [], _, _) :- !.
 %Para casos pares
-caminoDeLongitud(A, 2, [S,F], [E], S, F) :- transicionesDe(A, T), transicionesPosibles(T, S, F, E).
+%caminoDeLongitud(A, 2, [S,F], [E], S, F) :- transicionesDe(A, T), transicionesPosibles(T, S, F, E).
 %Para casos impares, podría traer un problema el tema de indices
-caminoDeLongitud(A, 1, [S, F], [E], S, F) :- transicionesDe(A, T), transicionesPosibles(T, S, F, E).
+%caminoDeLongitud(A, 1, [S, F], [E], S, F) :- transicionesDe(A, T), transicionesPosibles(T, S, F, E).
 %Veo las maneras posibles de llegar
 %Que pasa si CS es [] y N != 2
 %Hay que decrementar de a 2, porque suponemos que S,C ya estan agregados a CS
 %Esta todo medio emparchado pero parece andar
 %Hay que decir que DEC >= para que no entre acá con 1 y entre en un loop infinito
 %porque se pasaría N para los negativos y no tenemos un caso base para eso
-caminoDeLongitud(A, N, [S,C|CS], [E|ES], S, F) :- transicionesDe(A, T), DEC is N-2, DEC >= 0, transicionesPosibles(T, S, C, E), caminoDeLongitud(A, DEC, [C|CS], ES, C, F).
+%caminoDeLongitud(A, N, [S,C|CS], [E|ES], S, F) :- transicionesDe(A, T),
+%                                                  DEC is N-2, DEC >= 0,
+%                                                  transicionesPosibles(T, S, C, E),
+%                                                  caminoDeLongitud(A, DEC, [C|CS], ES, C, F).
+
+caminoDeLongitud(A, 1, [S], [], S, S) :- estados(A, E), member(S, E).
+caminoDeLongitud(A, N, [S1, S2 | Camino], [E | Etiquetas], S1, Sn) :- N >= 2,
+                                                                      transicionesDe(A, T),
+                                                                      transicionesPosibles(T, S1, S2, E),
+                                                                      M is N - 1,
+                                                                      caminoDeLongitud(A, M, [S2 | Camino], Etiquetas, S2, Sn).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 6) alcanzable(+Automata, +Estado)                                            %
@@ -141,14 +151,14 @@ hayCiclo(A) :- estados(A, E), length(E, LE), member(J, E), LB is LE*2, between(2
 %Y unifiquen con P
 %Uso CM = 2 * cantidad de estados, porque para transicionar a un estado se necesita un camino de al menos 2
 reconoce(A, P) :- not(hayCiclo(A)), !, ground(P), inicialDe(A,I), finalesDe(A,F),
-	estados(A, E), length(E, LE), CM is 2*LE, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm), !.
+    estados(A, E), length(E, LE), CM is 2*LE, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm), !.
 
 reconoce(A, P) :- not(hayCiclo(A)), !, nonvar(P), inicialDe(A,I), finalesDe(A,F),
-	estados(A, E), length(E, LE), CM is 2*LE, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm).
+    estados(A, E), length(E, LE), CM is 2*LE, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm).
 
 %No hay ciclo y no está definido P
 reconoce(A, P) :- not(hayCiclo(A)), !, not(nonvar(P)), inicialDe(A, I), finalesDe(A, F),
-	estados(A, E), length(E, LE), CM is 2*LE, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm).
+    estados(A, E), length(E, LE), CM is 2*LE, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm).
 
 %Separo en los casos de P definida y P no definida porque en el caso de que este definida, encuentra un valor y debería parar,
 %no puede seguir generando otros valores porque P como está definido deja de unificar.
@@ -164,15 +174,15 @@ reconoce(A, P) :- not(hayCiclo(A)), !, not(nonvar(P)), inicialDe(A, I), finalesD
 %Divido entre sin ciclos no definido, semi-definido y definido
 %Si esta totalmente definido, quiero un solo resultado
 reconoce(A, P) :- hayCiclo(A), ground(P), inicialDe(A, I), finalesDe(A, F),
-	length(P, Y), CM is Y*2, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm), !.
+    length(P, Y), CM is Y*2, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm), !.
 
 %Si esta semi definido, quiero los resultados posibles (pueden haber repetidos, ojo)
 reconoce(A, P) :- hayCiclo(A), nonvar(P), inicialDe(A, I), finalesDe(A, F),
-	length(P, Y), CM is Y*2, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm).
+    length(P, Y), CM is Y*2, between(1, CM, LC), member(Fm, F), caminoDeLongitud(A, LC, _, P, I, Fm).
 
 %Si hay un ciclo y no está definido P (totalmente indefinido), devuelvo todas las soluciones que pueda reonocer
 reconoce(A, P) :- hayCiclo(A), not(nonvar(P)), inicialDe(A, I), finalesDe(A, F),
-	desde(1, Y), member(Fm, F), caminoDeLongitud(A, Y, _, P, I, Fm).
+    desde(1, Y), member(Fm, F), caminoDeLongitud(A, Y, _, P, I, Fm).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 10) PalabraMásCorta(+Automata, ?Palabra)                                     %  
