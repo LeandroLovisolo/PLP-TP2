@@ -196,7 +196,7 @@ palabrasDeLongitudN(A, Palabras, N) :-
 %----- Tests -----
 %-----------------
 
-numeroDeTests(20).
+numeroDeTests(25).
 tests :- numeroDeTests(N), forall(between(1, N, I), test(I)). 
 
 % Tests provistos por la cátedra. 
@@ -225,3 +225,11 @@ test(17) :- ejemplo(2, A), esDeterministico(A).
 test(18) :- ejemplo(3, A), esDeterministico(A).
 test(19) :- ejemplo(4, A), not(esDeterministico(A)).
 test(20) :- ejemplo(5, A), esDeterministico(A).
+
+% Ejercicio 2
+test(21) :- ejemplo(1, A), estados(A, [s1, sf]). 
+test(22) :- ejemplo(2, A), estados(A, [si]). 
+test(23) :- ejemplo(3, A), estados(A, [si]). 
+test(24) :- ejemplo(4, A), estados(A, [s1, s2, s3]). 
+test(25) :- ejemplo(5, A), estados(A, [s1, s2, s3]). 
+
