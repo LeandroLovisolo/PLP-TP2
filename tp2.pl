@@ -63,8 +63,7 @@ estados(a(I, F, T), Ls) :- setof(X, (listaEstadosPorTransicion(T, Y1), append(F,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %hayTransicion(+T, +E1, +E2) Verdadero si hay una transicion
-hayTransicion([(E1, _, E2)|_], E1, E2) :- !.
-hayTransicion([(_, _, _)|Ls], E1, E2) :- hayTransicion(Ls, E1, E2).
+hayTransicion(T, E1, E2) :- member((E1, _, E2), T).
 
 %Si hay ciclos, no funciona la reversibilidad
 esCamino(A, S, S, [S]) :- transicionesDe(A, T), hayTransicion(T, S, S).
