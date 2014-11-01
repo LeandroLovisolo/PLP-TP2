@@ -163,7 +163,13 @@ automataValido(A) :- todoEstadoNoFinalTieneTransicionesSalientes(A),
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Corto porque al encontrar un camino que sale y entra del mismo nodo, ya hay un ciclo.
-hayCiclo(A) :- estados(A, E), length(E, LE), member(J, E), LB is LE+1, between(2, LB, LC), caminoDeLongitud(A, LC, _, _, J, J), !.
+hayCiclo(A) :- estados(A, Estados),
+               length(Estados, N),
+               member(E, Estados),
+               M is N + 1,
+               between(2, M, K),
+               caminoDeLongitud(A, K, _, _, E, E),
+               !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 9) reconoce(+Automata, ?Palabra)                                             %
