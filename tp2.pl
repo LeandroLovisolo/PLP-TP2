@@ -96,7 +96,6 @@ caminoDeLongitud(A, N, [S1, S2 | Camino], [E | Etiquetas], S1, Sn) :- N >= 2,
 % 6) alcanzable(+Automata, +Estado)                                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Posible solucion
 alcanzable(A, E) :- inicialDe(A, I),
                     estados(A, Estados),
                     length(Estados, N),
