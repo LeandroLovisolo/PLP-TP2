@@ -245,15 +245,15 @@ test(20) :- ejemplo(5, A), esDeterministico(A).
 % Nota: por estado de transición se entiende estado que no es ni inicial ni final.
 
 % Sin estados de transición, con transiciones.
-test(21) :- ejemplo(1, A), estados(A, [s1, sf]). 
+test(21) :- ejemplo(1, A), estados(A, Xs), permutation(Xs, [s1, sf]).
 % Sin transiciones.
-test(22) :- ejemplo(2, A), estados(A, [si]). 
+test(22) :- ejemplo(2, A), estados(A, Xs), Xs = [si].
 % Un único estado (el inicial).
-test(23) :- ejemplo(3, A), estados(A, [si]).
+test(23) :- ejemplo(3, A), estados(A, Xs), Xs = [si].
 % Más de un estado final, sin estados de transición.
-test(24) :- ejemplo(4, A), estados(A, [s1, s2, s3]). 
+test(24) :- ejemplo(4, A), estados(A, Xs), permutation(Xs, [s1, s2, s3]).
 % Un estado final, un estado de transición.
-test(25) :- ejemplo(6, A), estados(A, [s1, s2, s3]). 
+test(25) :- ejemplo(6, A), estados(A, Xs), permutation(Xs, [s1, s2, s3]). 
 % Más de un estado final, más de un estado de transición.
 test(26) :- ejemplo(10, A), estados(A, Xs), permutation(Xs, [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15]).
 
