@@ -75,7 +75,10 @@ esCamino(A, S, F, [S,L2|Ls]) :- transicionesDe(A, T), hayTransicion(T, S, L2), e
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Responder aquí.
-% No es reversible
+% No es reversible. El predicado actual tiene un corte en la segunda regla que hace que
+% solo se devuelva un resultado, perdiendose los restantes al intentar usar Camino
+% como -Camino. Si se removiera el !, los automatas con ciclos no devuelven todos
+% los caminos posibles, el camino entra en el ciclo indefinidamente.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 5) caminoDeLongitud(+Automata, +N, -Camino, -Etiquetas, ?S1, ?S2)            %
@@ -192,14 +195,17 @@ palabraMasCorta(A, P) :- desde(0, N),
 palabrasDeLongitudN(A, Palabras, N) :-
         findall(P, (length(P, N), reconoce(A, P)), Palabras).
 
-%-----------------
-%----- Tests -----
-%-----------------
 
-numeroDeTests(30).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+% Tests                                                                        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+
+numeroDeTests(32).
 tests :- numeroDeTests(N), forall(between(1, N, I), test(I)). 
 
-% Tests provistos por la cátedra. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+% Tests provistos por la cátedra                                               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 
 test(1)  :- forall(ejemplo(_, A),  automataValido(A)).
 test(2)  :- not((ejemploMalo(_, A),  automataValido(A))).
@@ -217,31 +223,56 @@ test(13) :- ejemplo(10, A),  findall(P, palabraMasCorta(A, P), [[p, r, o, l, o, 
 test(14) :- forall(member(X, [2, 4, 5, 6, 7, 8, 9]), (ejemplo(X, A), hayCiclo(A))).
 test(15) :- not((member(X, [1, 3, 10]), ejemplo(X, A), hayCiclo(A))).
 
-% Tests propios.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Tests propios                                                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Ejercicio 1
+% Ejercicio 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Una sola transición, sin ciclos.
 test(16) :- ejemplo(1, A), esDeterministico(A).
+% Una sola transición, con ciclos.
 test(17) :- ejemplo(2, A), esDeterministico(A).
+% Sin transiciones.
 test(18) :- ejemplo(3, A), esDeterministico(A).
+% Varias transiciones, no determinístico.
 test(19) :- ejemplo(4, A), not(esDeterministico(A)).
+% Varias transiciones, determinístico.
 test(20) :- ejemplo(5, A), esDeterministico(A).
 
-% Ejercicio 2
+% Ejercicio 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Nota: por estado de transición se entiende estado que no es ni inicial ni final.
+
+% Sin estados de transición, con transiciones.
 test(21) :- ejemplo(1, A), estados(A, [s1, sf]). 
+% Sin transiciones.
 test(22) :- ejemplo(2, A), estados(A, [si]). 
-test(23) :- ejemplo(3, A), estados(A, [si]). 
+% Un único estado (el inicial).
+test(23) :- ejemplo(3, A), estados(A, [si]).
+% Más de un estado final, sin estados de transición.
 test(24) :- ejemplo(4, A), estados(A, [s1, s2, s3]). 
-test(25) :- ejemplo(5, A), estados(A, [s1, s2, s3]). 
+% Un estado final, un estado de transición.
+test(25) :- ejemplo(6, A), estados(A, [s1, s2, s3]). 
+% Más de un estado final, más de un estado de transición.
+test(26) :- ejemplo(10, A), estados(A, Xs), permutation(Xs, [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15]).
 
-% Ejercicio 3
-test(26) :- ejemplo(1, A), esCamino(A, s1, sf, [s1, sf]). 
-test(27) :- ejemplo(1, A), not(esCamino(A, s1, sf, [sf, s1])). 
+% Ejercicio 3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Camino de longitud 0 (inválido).
+test(27) :- ejemplo(1, A), not(esCamino(A, s1, s1, [])). 
+% Camino de longitud 1 (ciclo a sí mismo).
 test(28) :- ejemplo(2, A), esCamino(A, si, si, [si]). 
-test(29) :- ejemplo(2, A), not(esCamino(A, si, si, [])). 
-
-
-
-test(28) :- ejemplo(2, A), estados(A, [si]). 
-test(29) :- ejemplo(3, A), estados(A, [si]). 
-test(30) :- ejemplo(4, A), estados(A, [s1, s2, s3]). 
-test(31) :- ejemplo(5, A), estados(A, [s1, s2, s3]). 
+% Camino de longitud 2.
+test(29) :- ejemplo(1, A), esCamino(A, s1, sf, [s1, sf]). 
+% Camino de longitud 2 inválido (origen/destino invertidos, camino invertido).
+test(30) :- ejemplo(1, A), not(esCamino(A, sf, s1, [sf, s1])). 
+% Camino de longitud 2 inválido (origen/destino invertidos, camino correcto).
+test(31) :- ejemplo(1, A), not(esCamino(A, sf, s1, [sf, s1])). 
+% Camino de longitud 2 inválido (origen/destino correctos, camino invertido).
+test(32) :- ejemplo(1, A), not(esCamino(A, s1, sf, [sf, s1])). 
+%test(26) :- ejemplo(4, A), esCamino(A, s1, s2, [s1,s2]).
+%test(27) :- ejemplo(5, A), esCamino(A, S, F, [s1, s2, s3]), S = s1, F = s3.
+%test(28) :- ejemplo(10, A), not(esCamino(A, s6, s15, [s6,s7,s8,s9,s15])).
+%test(29) :- ejemplo(10, A), esCamino(A, S, F, [s14, s15, s11]), S = s14, F = s11.
+%test(30) :- ejemploMalo(2, A), not(esCamino(A, s1, sf, [s1, sf])).
