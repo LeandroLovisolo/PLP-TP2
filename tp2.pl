@@ -200,7 +200,7 @@ palabrasDeLongitudN(A, Palabras, N) :-
 % Tests                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 
-numeroDeTests(32).
+numeroDeTests(35).
 tests :- numeroDeTests(N), forall(between(1, N, I), test(I)). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
@@ -271,8 +271,9 @@ test(30) :- ejemplo(1, A), not(esCamino(A, sf, s1, [sf, s1])).
 test(31) :- ejemplo(1, A), not(esCamino(A, sf, s1, [sf, s1])). 
 % Camino de longitud 2 inválido (origen/destino correctos, camino invertido).
 test(32) :- ejemplo(1, A), not(esCamino(A, s1, sf, [sf, s1])). 
-%test(26) :- ejemplo(4, A), esCamino(A, s1, s2, [s1,s2]).
-%test(27) :- ejemplo(5, A), esCamino(A, S, F, [s1, s2, s3]), S = s1, F = s3.
-%test(28) :- ejemplo(10, A), not(esCamino(A, s6, s15, [s6,s7,s8,s9,s15])).
-%test(29) :- ejemplo(10, A), esCamino(A, S, F, [s14, s15, s11]), S = s14, F = s11.
-%test(30) :- ejemploMalo(2, A), not(esCamino(A, s1, sf, [s1, sf])).
+% Camino de longitud 7 (origen/destino no instanciados - palabra "prolog").
+test(33) :- ejemplo(10, A), esCamino(A, S1, S2, [s1, s2, s12, s13, s14, s15, s11]), S1 = s1, S2 = s11.
+% Camino de longitud 7 inválido (origen/destino no instanciados, camino inválido).
+test(34) :- ejemplo(10, A), not(esCamino(A, _, _, [s1, s2, s11, s12, s13, s14, s15])).
+% Camino de longitud 7 inválido (origen/destino incorrectos - palabra "prolog").
+test(35) :- ejemplo(10, A), not(esCamino(A, s2, s15, [s1, s2, s12, s13, s14, s15, s11])).
