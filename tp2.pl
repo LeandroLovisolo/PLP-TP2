@@ -75,7 +75,10 @@ esCamino(A, S, F, [S,L2|Ls]) :- transicionesDe(A, T), hayTransicion(T, S, L2), e
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Responder aquí.
-% No es reversible
+% No es reversible. El predicado actual tiene un corte en la segunda regla que hace que
+% solo se devuelva un resultado, perdiendose los restantes al intentar usar Camino
+% como -Camino. Si se removiera el !, los automatas con ciclos no devuelven todos
+% los caminos posibles, el camino entra en el ciclo indefinidamente.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 5) caminoDeLongitud(+Automata, +N, -Camino, -Etiquetas, ?S1, ?S2)            %
