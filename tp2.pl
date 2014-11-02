@@ -196,7 +196,7 @@ palabrasDeLongitudN(A, Palabras, N) :-
 %----- Tests -----
 %-----------------
 
-numeroDeTests(25).
+numeroDeTests(30).
 tests :- numeroDeTests(N), forall(between(1, N, I), test(I)). 
 
 % Tests provistos por la cátedra. 
@@ -233,3 +233,15 @@ test(23) :- ejemplo(3, A), estados(A, [si]).
 test(24) :- ejemplo(4, A), estados(A, [s1, s2, s3]). 
 test(25) :- ejemplo(5, A), estados(A, [s1, s2, s3]). 
 
+% Ejercicio 3
+test(26) :- ejemplo(1, A), esCamino(A, s1, sf, [s1, sf]). 
+test(27) :- ejemplo(1, A), not(esCamino(A, s1, sf, [sf, s1])). 
+test(28) :- ejemplo(2, A), esCamino(A, si, si, [si]). 
+test(29) :- ejemplo(2, A), not(esCamino(A, si, si, [])). 
+
+
+
+test(28) :- ejemplo(2, A), estados(A, [si]). 
+test(29) :- ejemplo(3, A), estados(A, [si]). 
+test(30) :- ejemplo(4, A), estados(A, [s1, s2, s3]). 
+test(31) :- ejemplo(5, A), estados(A, [s1, s2, s3]). 
