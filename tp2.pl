@@ -43,7 +43,7 @@ desde(X, Y):-desde(X, Z),  Y is Z + 1.
 %%Predicados pedidos.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 1) %esDeterministico(+Automata)                                              %
+% 1) esDeterministico(+Automata)                                               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %transcionesSonDeterministicas(+Transiciones)
@@ -72,26 +72,26 @@ estados(a(I, F, T), Ls) :-
           Ls).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 3)esCamino(+Automata, ?EstadoInicial, ?EstadoFinal, +Camino)                 %
+% 3) esCamino(+Automata, ?EstadoInicial, ?EstadoFinal, +Camino)                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%hayTransicion(+T, +E1, +E2) Verdadero si hay una transicion
-hayTransicion(A, E1, E2) :- transicionesDe(A, T),
-                            member((E1, _, E2), T).
+% hayTransicion(+A, +S1, +S2). Se verifica si el autómata A tiene una transición
+% entre los estados S1 y S2.
+hayTransicion(A, S1, S2) :- transicionesDe(A, T),
+                            member((S1, _, S2), T).
 
 %Si hay ciclos, no funciona la reversibilidad
 esCamino(A, S, S, [S]) :- hayTransicion(A, S, S).
 esCamino(A, S, F, [S, F]) :- hayTransicion(A, S, F), !.
-esCamino(A, S, F, [S, L2 | Ls]) :- hayTransicion(A, S, L2),
-                                   esCamino(A, L2, F, [L2 | Ls]).
+esCamino(A, S1, Sn, [S1, S2 | Ss]) :- hayTransicion(A, S1, S2),
+                                      esCamino(A, S2, Sn, [S2 | Ss]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 4) ¿el predicado anterior es o no reversible con respecto a Camino y por qué?%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Responder aquí.
-% No es reversible. El predicado actual tiene un corte en la segunda regla que hace que
-% solo se devuelva un resultado, perdiendose los restantes al intentar usar Camino
+% No es reversible. El predicado actual tiene un corte en la segunda regla que
+% hace que sólo se devuelva un resultado, perdiéndose los restantes al intentar usar Camino
 % como -Camino. Si se removiera el !, los automatas con ciclos no devuelven todos
 % los caminos posibles, el camino entra en el ciclo indefinidamente.
 
