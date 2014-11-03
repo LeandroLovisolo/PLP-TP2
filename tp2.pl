@@ -7,13 +7,19 @@ ejemplo(4, a(s1, [s2, s3], [(s1, a, s1), (s1, a, s2), (s1, b, s3)])).
 ejemplo(5, a(s1, [s2, s3], [(s1, a, s1), (s1, b, s2), (s1, c, s3), (s2, c, s3)])).
 ejemplo(6, a(s1, [s3], [(s1, b, s2), (s3, n, s2), (s2, a, s3)])).
 ejemplo(7, a(s1, [s2], [(s1, a, s3), (s3, a, s3), (s3, b, s2), (s2, b, s2)])).
-ejemplo(8, a(s1, [sf], [(s1, a, s2), (s2, a, s3), (s2, b, s3), (s3, a, s1), (s3, b, s2), (s3, b, s4), (s4, f, sf)])). % No deterministico :)
+ejemplo(8, a(s1, [sf], [(s1, a, s2), (s2, a, s3), (s2, b, s3), (s3, a, s1),
+                        (s3, b, s2),(s3, b, s4), (s4, f, sf)])). % No deterministico :)
 ejemplo(9, a(s1, [s1], [(s1, a, s2), (s2, b, s1)])).
-ejemplo(10, a(s1, [s10, s11], 
-        [(s2, a, s3), (s4, a, s5), (s9, a, s10), (s5, d, s6), (s7, g, s8), (s15, g, s11), (s6, i, s7), (s13, l, s14), (s8, m, s9), (s12, o, s13), (s14, o, s15), (s1, p, s2), (s3, r, s4), (s2, r, s12), (s10, s, s11)])).
-ejemplo(11, a(s1, [s4], [(s1, a, s2), (s1, b, s3), (s2, b, s4), (s3, b, s4), (s1, c, s4)])).
+ejemplo(10, a(s1, [s10, s11], [(s2, a, s3), (s4, a, s5), (s9, a, s10),
+                               (s5, d, s6), (s7, g, s8), (s15, g, s11),
+                               (s6, i, s7), (s13, l, s14), (s8, m, s9),
+                               (s12, o, s13), (s14, o, s15), (s1, p, s2),
+                               (s3, r, s4), (s2, r, s12), (s10, s, s11)])).
+ejemplo(11, a(s1, [s4], [(s1, a, s2), (s1, b, s3), (s2, b, s4),
+                         (s3, b, s4), (s1, c, s4)])).
 
-ejemploMalo(1, a(s1, [s2], [(s1, a, s1), (s1, b, s2), (s2, b, s2), (s2, a, s3)])). %s3 es un estado sin salida.
+ejemploMalo(1, a(s1, [s2], [(s1, a, s1), (s1, b, s2),
+                            (s2, b, s2), (s2, a, s3)])). %s3 es un estado sin salida.
 ejemploMalo(2, a(s1, [sf], [(s1, a, s1), (sf, b, sf)])). %sf no es alcanzable.
 ejemploMalo(3, a(s1, [s2, s3], [(s1, a, s3), (s1, b, s3)])). %s2 no es alcanzable.
 ejemploMalo(4, a(s1, [s3], [(s1, a, s3), (s2, b, s3)])). %s2 no es alcanzable.
@@ -42,10 +48,10 @@ desde(X, Y):-desde(X, Z),  Y is Z + 1.
 
 %transcionesSonDeterministicas(+Transiciones)
 transcionesSonDeterministicas([]).
-transcionesSonDeterministicas([(E1, Etiqueta, _)|Ls]) :- forall(member(L, Ls),
-                                                                L \= (E1, Etiqueta, _)),
-                                                         transcionesSonDeterministicas(Ls).
-
+transcionesSonDeterministicas([(E1, Etiqueta, _)|Ls]) :- 
+     forall(member(L, Ls),
+            L \= (E1, Etiqueta, _)),
+     transcionesSonDeterministicas(Ls).
 esDeterministico(A) :- transicionesDe(A, T), transcionesSonDeterministicas(T).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -54,9 +60,16 @@ esDeterministico(A) :- transicionesDe(A, T), transcionesSonDeterministicas(T).
 
 %listaEstadosPorTransicion(+Automata, ?Estados)
 listaEstadosPorTransicion([], []).
-listaEstadosPorTransicion([(S1, _, S2)|Ls], [S1,S2|Es]) :- listaEstadosPorTransicion(Ls, Es).
+listaEstadosPorTransicion([(S1, _, S2)|Ls], [S1,S2|Es]) :-
+    listaEstadosPorTransicion(Ls, Es).
 
-estados(a(I, F, T), Ls) :- setof(X, (listaEstadosPorTransicion(T, Y1), append(F, Y1, Y2), append([I], Y2, Y3), member(X, Y3)), Ls).
+estados(a(I, F, T), Ls) :-
+    setof(X,
+          (listaEstadosPorTransicion(T, Y1),
+           append(F, Y1, Y2),
+           append([I], Y2, Y3),
+           member(X, Y3)),
+          Ls).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 3)esCamino(+Automata, ?EstadoInicial, ?EstadoFinal, +Camino)                 %
@@ -68,7 +81,8 @@ hayTransicion(T, E1, E2) :- member((E1, _, E2), T).
 %Si hay ciclos, no funciona la reversibilidad
 esCamino(A, S, S, [S]) :- transicionesDe(A, T), hayTransicion(T, S, S).
 esCamino(A, S, F, [S,F]) :- transicionesDe(A, T), hayTransicion(T, S, F), !.
-esCamino(A, S, F, [S,L2|Ls]) :- transicionesDe(A, T), hayTransicion(T, S, L2), esCamino(A, L2, F, [L2|Ls]).
+esCamino(A, S, F, [S,L2|Ls]) :-
+    transicionesDe(A, T), hayTransicion(T, S, L2), esCamino(A, L2, F, [L2|Ls]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 4) ¿el predicado anterior es o no reversible con respecto a Camino y por qué?%
@@ -91,9 +105,9 @@ transicionesPosibles(T, S1, S2, E) :- member((S1, E, S2), T).
 caminoDeLongitud(A, 1, [S], [], S, S) :- estados(A, E), member(S, E).
 caminoDeLongitud(A, N, [S1, S2 | Camino], [E | Etiquetas], S1, Sn) :- 
     N >= 2,                                                   
-    transicionesDe(A, T),                                                                                                     
-    transicionesPosibles(T, S1, S2, E),                                                                                       
-    M is N - 1,                                                                                                               
+    transicionesDe(A, T),
+    transicionesPosibles(T, S1, S2, E),
+    M is N - 1,
     caminoDeLongitud(A, M, [S2 | Camino], Etiquetas, S2, Sn).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -111,22 +125,27 @@ alcanzable(A, E) :- inicialDe(A, I),
 % 7) automataValido(+Automata)                                                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-estadosNoFinales(A, EstadosNoFinales) :- estados(A, Estados),
-                                         finalesDe(A, EstadosFinales),
-                                         subtract(Estados, EstadosFinales, EstadosNoFinales).
+estadosNoFinales(A, EstadosNoFinales) :- 
+    estados(A, Estados),
+    finalesDe(A, EstadosFinales),
+    subtract(Estados, EstadosFinales, EstadosNoFinales).
 
-todoEstadoNoFinalTieneTransicionesSalientes(A) :- estadosNoFinales(A, EstadosNoFinales),
-                                                  transicionesDe(A, T),                     
-                                                  forall(member(E, EstadosNoFinales),
-                                                         transicionesPosibles(T, E, _, _)).
+todoEstadoNoFinalTieneTransicionesSalientes(A) :- 
+     estadosNoFinales(A, EstadosNoFinales),
+     transicionesDe(A, T),
+     forall(member(E, EstadosNoFinales),
+            transicionesPosibles(T, E, _, _)).
 
-estadosNoIniciales(A, EstadosNoIniciales) :- estados(A, Estados),
-                                             inicialDe(A, Inicial),
-                                             subtract(Estados, [Inicial], EstadosNoIniciales).
+estadosNoIniciales(A, EstadosNoIniciales) :- 
+     estados(A, Estados),
+     inicialDe(A, Inicial),
+     subtract(Estados, [Inicial], EstadosNoIniciales).
 
-todoEstadoEsAlcanzableDesdeElInicial(A) :- estadosNoIniciales(A, EstadosNoIniciales),
-                                           forall(member(E, EstadosNoIniciales),
-                                                  alcanzable(A, E)).
+todoEstadoEsAlcanzableDesdeElInicial(A) :-
+      estadosNoIniciales(A, EstadosNoIniciales),
+      forall(member(E, EstadosNoIniciales),
+             alcanzable(A, E)).
+                                          
 tieneEstadosFinales(A) :- finalesDe(A, Finales), Finales \= [].
 
 noTieneRepetidos([]).
@@ -215,11 +234,14 @@ test(4)  :- ejemplo(9, A), reconoce(A, [a,  b,  a,  b,  a,  b,  a,  b]).
 test(5)  :- ejemplo(7, A), reconoce(A, [a,  a,  a,  b,  b]).
 test(6)  :- ejemplo(7, A), not(reconoce(A, [b])).
 test(7)  :- ejemplo(2, A),  findall(P, palabraMasCorta(A, P), [[]]).
-test(8)  :- ejemplo(4, A),  findall(P, palabraMasCorta(A, P), Lista), length(Lista, 2), sort(Lista, [[a], [b]]).
-test(9)  :- ejemplo(5, A),  findall(P, palabraMasCorta(A, P), Lista), length(Lista, 2), sort(Lista, [[b], [c]]).
+test(8)  :- ejemplo(4, A),  findall(P, palabraMasCorta(A, P), Lista),
+            length(Lista, 2), sort(Lista, [[a], [b]]).
+test(9)  :- ejemplo(5, A),  findall(P, palabraMasCorta(A, P), Lista),
+            length(Lista, 2), sort(Lista, [[b], [c]]).
 test(10) :- ejemplo(6, A),  findall(P, palabraMasCorta(A, P), [[b, a]]).
 test(11) :- ejemplo(7, A),  findall(P, palabraMasCorta(A, P), [[a, b]]).
-test(12) :- ejemplo(8, A),  findall(P, palabraMasCorta(A, P), Lista), length(Lista, 2), sort(Lista, [[a,  a,  b,  f], [a,  b,  b,  f]]).
+test(12) :- ejemplo(8, A),  findall(P, palabraMasCorta(A, P), Lista),
+            length(Lista, 2), sort(Lista, [[a,  a,  b,  f], [a,  b,  b,  f]]).
 test(13) :- ejemplo(10, A),  findall(P, palabraMasCorta(A, P), [[p, r, o, l, o, g]]).
 test(14) :- forall(member(X, [2, 4, 5, 6, 7, 8, 9]), (ejemplo(X, A), hayCiclo(A))).
 test(15) :- not((member(X, [1, 3, 10]), ejemplo(X, A), hayCiclo(A))).
@@ -256,7 +278,9 @@ test(24) :- ejemplo(4, A), estados(A, Xs), permutation(Xs, [s1, s2, s3]).
 % Un estado final, un estado de transición.
 test(25) :- ejemplo(6, A), estados(A, Xs), permutation(Xs, [s1, s2, s3]). 
 % Más de un estado final, más de un estado de transición.
-test(26) :- ejemplo(10, A), estados(A, Xs), permutation(Xs, [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15]).
+test(26) :- ejemplo(10, A), estados(A, Xs),
+            permutation(Xs, [s1, s2, s3, s4, s5, s6, s7, s8,
+                             s9, s10, s11, s12, s13, s14, s15]).
 
 % Ejercicio 3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -273,7 +297,8 @@ test(31) :- ejemplo(1, A), not(esCamino(A, sf, s1, [sf, s1])).
 % Camino de longitud 2 inválido (origen/destino correctos, camino invertido).
 test(32) :- ejemplo(1, A), not(esCamino(A, s1, sf, [sf, s1])). 
 % Camino de longitud 7 (origen/destino no instanciados - palabra "prolog").
-test(33) :- ejemplo(10, A), esCamino(A, S1, S2, [s1, s2, s12, s13, s14, s15, s11]), S1 = s1, S2 = s11.
+test(33) :- ejemplo(10, A), esCamino(A, S1, S2, [s1, s2, s12, s13, s14, s15, s11]),
+            S1 = s1, S2 = s11.
 % Camino de longitud 7 inválido (origen/destino no instanciados, camino inválido).
 test(34) :- ejemplo(10, A), not(esCamino(A, _, _, [s1, s2, s11, s12, s13, s14, s15])).
 % Camino de longitud 7 inválido (origen/destino incorrectos - palabra "prolog").
@@ -284,24 +309,40 @@ test(35) :- ejemplo(10, A), not(esCamino(A, s2, s15, [s1, s2, s12, s13, s14, s15
 % Camino de longitud 1 (origen/destino instanciados).
 test(36) :- ejemplo(1, A), caminoDeLongitud(A, 1, C, E, s1, s1), C = [s1], E = [].
 % Caminos de longitud 1 (origen/destino no instanciados).
-test(37) :- ejemplo(1, A), findall((C, E, S1, S2), caminoDeLongitud(A, 1, C, E, S1, S2), Xs), permutation(Xs, [([s1], [], s1, s1), ([sf], [], sf, sf)]).
+test(37) :- ejemplo(1, A), findall((C, E, S1, S2),
+                                   caminoDeLongitud(A, 1, C, E, S1, S2),
+                                   Xs),
+            permutation(Xs, [([s1], [], s1, s1), ([sf], [], sf, sf)]).
 % Camino de longitud 2 válido (origen/destino instanciados).
 test(38) :- ejemplo(1, A), caminoDeLongitud(A, 2, C, E, s1, sf), C = [s1, sf], E = [a]. 
 % Camino de longitud 2 válido (origen/destino no instanciados).
-test(39) :- ejemplo(1, A), caminoDeLongitud(A, 2, C, E, S1, S2), C = [s1, sf], E = [a], S1 = s1, S2 = sf.
+test(39) :- ejemplo(1, A), caminoDeLongitud(A, 2, C, E, S1, S2),
+            C = [s1, sf], E = [a], S1 = s1, S2 = sf.
 % Camino de longitud 2 inválido (origen/destino invertidos).
 test(40) :- ejemplo(1, A), not(caminoDeLongitud(A, 2, _, _, sf, s1)).
 % Caminos de longitud 3 (origen/destino instanciados).
-test(41) :- ejemplo(5, A), findall((C, E), caminoDeLongitud(A, 3, C, E, s1, s3), Xs), permutation(Xs, [([s1, s1, s3], [a, c]), ([s1, s2, s3], [b, c])]).
+test(41) :- ejemplo(5, A), findall((C, E), caminoDeLongitud(A, 3, C, E, s1, s3), Xs),
+            permutation(Xs, [([s1, s1, s3], [a, c]), ([s1, s2, s3], [b, c])]).
 % Caminos de longitud 3 (origen/destino no instanciados).
-test(42) :- ejemplo(5, A), findall((C, E, S1, S2), caminoDeLongitud(A, 3, C, E, S1, S2), Xs), permutation(Xs, [([s1, s1, s1], [a, a], s1, s1), ([s1, s1, s2], [a, b], s1, s2), ([s1, s1, s3], [a, c], s1, s3), ([s1, s2, s3], [b, c], s1, s3)]).
+test(42) :- ejemplo(5, A), findall((C, E, S1, S2),
+                                   caminoDeLongitud(A, 3, C, E, S1, S2),
+                                   Xs),
+            permutation(Xs, [([s1, s1, s1], [a, a], s1, s1),
+                             ([s1, s1, s2], [a, b], s1, s2),
+                             ([s1, s1, s3], [a, c], s1, s3),
+                             ([s1, s2, s3], [b, c], s1, s3)]).
 
 % Ejercicio 6 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Todos los estados de todos los autómatas de ejemplo son alcanzables.
-test(43) :- forall(ejemplo(_, A), (estados(A, Es), forall(member(E, Es), alcanzable(A, E)))).
-% Los automatas de ejemplos malos con estados no alcanzables efectivamente tienen estados no alcanzables.
-test(44) :- forall(between(2, 4, N), (ejemploMalo(N, A), estados(A, Es), member(E, Es), not(alcanzable(A, E)))).
+test(43) :- forall(ejemplo(_, A), (estados(A, Es), forall(member(E, Es),
+                                                          alcanzable(A, E)))).
+% Los autómatas de ejemplos malos con estados no alcanzables efectivamente tienen
+% estados no alcanzables.
+test(44) :- forall(between(2, 4, N), (ejemploMalo(N, A),
+                                      estados(A, Es),
+                                      member(E, Es),
+                                      not(alcanzable(A, E)))).
 
 % Ejercicio 7 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
