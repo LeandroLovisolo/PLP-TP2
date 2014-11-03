@@ -89,11 +89,12 @@ esCamino(A, S, F, [S,L2|Ls]) :- transicionesDe(A, T), hayTransicion(T, S, L2), e
 transicionesPosibles(T, S1, S2, E) :- member((S1, E, S2), T).
 
 caminoDeLongitud(A, 1, [S], [], S, S) :- estados(A, E), member(S, E).
-caminoDeLongitud(A, N, [S1, S2 | Camino], [E | Etiquetas], S1, Sn) :- N >= 2,
-                                                                      transicionesDe(A, T),
-                                                                      transicionesPosibles(T, S1, S2, E),
-                                                                      M is N - 1,
-                                                                      caminoDeLongitud(A, M, [S2 | Camino], Etiquetas, S2, Sn).
+caminoDeLongitud(A, N, [S1, S2 | Camino], [E | Etiquetas], S1, Sn) :- 
+    N >= 2,                                                   
+    transicionesDe(A, T),                                                                                                     
+    transicionesPosibles(T, S1, S2, E),                                                                                       
+    M is N - 1,                                                                                                               
+    caminoDeLongitud(A, M, [S2 | Camino], Etiquetas, S2, Sn).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 6) alcanzable(+Automata, +Estado)                                            %
@@ -200,7 +201,7 @@ palabrasDeLongitudN(A, Palabras, N) :-
 % Tests                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 
-numeroDeTests(35).
+numeroDeTests(42).
 tests :- numeroDeTests(N), forall(between(1, N, I), test(I)). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
@@ -277,3 +278,20 @@ test(33) :- ejemplo(10, A), esCamino(A, S1, S2, [s1, s2, s12, s13, s14, s15, s11
 test(34) :- ejemplo(10, A), not(esCamino(A, _, _, [s1, s2, s11, s12, s13, s14, s15])).
 % Camino de longitud 7 inválido (origen/destino incorrectos - palabra "prolog").
 test(35) :- ejemplo(10, A), not(esCamino(A, s2, s15, [s1, s2, s12, s13, s14, s15, s11])).
+
+% Ejercicio 5 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Camino de longitud 1 (origen/destino instanciados).
+test(36) :- ejemplo(1, A), caminoDeLongitud(A, 1, C, E, s1, s1), C = [s1], E = [].
+% Caminos de longitud 1 (origen/destino no instanciados).
+test(37) :- ejemplo(1, A), findall((C, E, S1, S2), caminoDeLongitud(A, 1, C, E, S1, S2), Xs), permutation(Xs, [([s1], [], s1, s1), ([sf], [], sf, sf)]).
+% Camino de longitud 2 válido (origen/destino instanciados).
+test(38) :- ejemplo(1, A), caminoDeLongitud(A, 2, C, E, s1, sf), C = [s1, sf], E = [a]. 
+% Camino de longitud 2 válido (origen/destino no instanciados).
+test(39) :- ejemplo(1, A), caminoDeLongitud(A, 2, C, E, S1, S2), C = [s1, sf], E = [a], S1 = s1, S2 = sf.
+% Camino de longitud 2 inválido (origen/destino invertidos).
+test(40) :- ejemplo(1, A), not(caminoDeLongitud(A, 2, _, _, sf, s1)).
+% Caminos de longitud 3 (origen/destino instanciados).
+test(41) :- ejemplo(5, A), findall((C, E), caminoDeLongitud(A, 3, C, E, s1, s3), Xs), permutation(Xs, [([s1, s1, s3], [a, c]), ([s1, s2, s3], [b, c])]).
+% Caminos de longitud 3 (origen/destino no instanciados).
+test(42) :- ejemplo(5, A), findall((C, E, S1, S2), caminoDeLongitud(A, 3, C, E, S1, S2), Xs), permutation(Xs, [([s1, s1, s1], [a, a], s1, s1), ([s1, s1, s2], [a, b], s1, s2), ([s1, s1, s3], [a, c], s1, s3), ([s1, s2, s3], [b, c], s1, s3)]).
