@@ -34,7 +34,7 @@ finalesDe(a(_, F, _), F).
 
 transicionesDe(a(_, _, T), T).
 
-% Auxiliar dada en clase
+% Auxiliar dado en clase.
 % desde(+X, -Y)
 desde(X, X).
 desde(X, Y):-desde(X, Z),  Y is Z + 1.
@@ -45,10 +45,10 @@ desde(X, Y):-desde(X, Z),  Y is Z + 1.
 
 % transcionesSonDeterministicas(+Transiciones)
 transcionesSonDeterministicas([]).
-transcionesSonDeterministicas([(E1, Etiqueta, _)|Ls]) :- 
-     forall(member(L, Ls),
-            L \= (E1, Etiqueta, _)),
-     transcionesSonDeterministicas(Ls).
+transcionesSonDeterministicas([(S, E, _) | Ts]) :- 
+     forall(member(T, Ts), T \= (S, E, _)),
+     transcionesSonDeterministicas(Ts).
+
 esDeterministico(A) :- transicionesDe(A, T), transcionesSonDeterministicas(T).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
