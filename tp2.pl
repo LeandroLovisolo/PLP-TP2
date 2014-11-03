@@ -1,4 +1,4 @@
-%Autómatas de ejemplo. Si agregan otros,  mejor.
+% Autómatas de ejemplo. Si agregan otros,  mejor.
 
 ejemplo(1, a(s1, [sf], [(s1, a, sf)])).
 ejemplo(2, a(si, [si], [(si, a, si)])).
@@ -27,26 +27,23 @@ ejemploMalo(5, a(s1, [s3, s2, s3], [(s1, a, s2), (s2, b, s3)])). %Tiene un estad
 ejemploMalo(6, a(s1, [s3], [(s1, a, s2), (s2, b, s3), (s1, a, s2)])). %Tiene una transición repetida.
 ejemploMalo(7, a(s1, [], [(s1, a, s2), (s2, b, s3)])). %No tiene estados finales.
 
-%%Proyectores
+% Proyectores
 inicialDe(a(I, _, _), I).
 
 finalesDe(a(_, F, _), F).
 
 transicionesDe(a(_, _, T), T).
 
-%Auxiliar dada en clase
-%desde(+X, -Y).
+% Auxiliar dada en clase
+% desde(+X, -Y)
 desde(X, X).
 desde(X, Y):-desde(X, Z),  Y is Z + 1.
-
-
-%%Predicados pedidos.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1) esDeterministico(+Automata)                                               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%transcionesSonDeterministicas(+Transiciones)
+% transcionesSonDeterministicas(+Transiciones)
 transcionesSonDeterministicas([]).
 transcionesSonDeterministicas([(E1, Etiqueta, _)|Ls]) :- 
      forall(member(L, Ls),
@@ -58,7 +55,7 @@ esDeterministico(A) :- transicionesDe(A, T), transcionesSonDeterministicas(T).
 % 2) estados(+Automata, ?Estados)                                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%listaEstadosPorTransicion(+Automata, ?Estados)
+% listaEstadosPorTransicion(+Automata, ?Estados)
 listaEstadosPorTransicion([], []).
 listaEstadosPorTransicion([(S1, _, S2)|Ls], [S1,S2|Es]) :-
     listaEstadosPorTransicion(Ls, Es).
@@ -99,8 +96,8 @@ esCamino(A, S1, Sn, [S1, S2 | Ss]) :- hayTransicion(A, S1, S2),
 % 5) caminoDeLongitud(+Automata, +N, -Camino, -Etiquetas, ?S1, ?S2)            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Devuelve etiqueta y estado al que es posible moverse desde ese estado
-%transicionesPosibles(+T, +E1, -E2, -Et)
+% Devuelve etiqueta y estado al que es posible moverse desde ese estado
+% transicionesPosibles(+T, +E1, -E2, -Et)
 transicionesPosibles(T, S1, S2, E) :- member((S1, E, S2), T).
 
 caminoDeLongitud(A, 1, [S], [], S, S) :- estados(A, E), member(S, E).
@@ -168,7 +165,7 @@ automataValido(A) :- todoEstadoNoFinalTieneTransicionesSalientes(A),
 % 8) hayCiclo(+Automata)                                                       %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Corto porque al encontrar un camino que sale y entra del mismo nodo, ya hay un ciclo.
+% Corto porque al encontrar un camino que sale y entra del mismo nodo, ya hay un ciclo.
 hayCiclo(A) :- estados(A, Estados),
                length(Estados, N),
                member(E, Estados),
@@ -199,8 +196,8 @@ reconoce(A, Palabra) :- not(ground(Palabra)), reconoceUna(A, Palabra).
 % 10) PalabraMásCorta(+Automata, ?Palabra)                                     %  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%La primera vez que reconozca una palabra, tira los resultados posibles para esa palabra
-%Parece que el redo hace las cosas 4 veces. Hay resultados repetidos
+% La primera vez que reconozca una palabra, tira los resultados posibles para esa palabra
+% Parece que el redo hace las cosas 4 veces. Hay resultados repetidos
 palabraMasCorta(A, P) :- desde(0, Y),
                          length(P, Y),
                          length(X, Y),
@@ -347,4 +344,16 @@ test(44) :- forall(between(2, 4, N), (ejemploMalo(N, A),
 
 % Ejercicio 7 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Cubierto por los tests provistos por la cátedra.
 
+% Ejercicio 8 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Cubierto por los tests provistos por la cátedra.
+
+% Ejercicio 9 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Cubierto por los tests provistos por la cátedra.
+
+% Ejercicio 10 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Cubierto por los tests provistos por la cátedra.
