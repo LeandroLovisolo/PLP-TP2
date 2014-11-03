@@ -82,7 +82,7 @@ hayTransicion(A, S1, S2) :- transicionesDe(A, T),
 
 %Si hay ciclos, no funciona la reversibilidad
 esCamino(A, S, S, [S]) :- hayTransicion(A, S, S).
-esCamino(A, S, F, [S, F]) :- hayTransicion(A, S, F), !.
+esCamino(A, S, F, [S, F]) :- hayTransicion(A, S, F).
 esCamino(A, S1, Sn, [S1, S2 | Ss]) :- hayTransicion(A, S1, S2),
                                       esCamino(A, S2, Sn, [S2 | Ss]).
 
