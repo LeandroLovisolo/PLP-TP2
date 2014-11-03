@@ -55,18 +55,22 @@ esDeterministico(A) :- transicionesDe(A, T), transcionesSonDeterministicas(T).
 % 2) estados(+Automata, ?Estados)                                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% listaEstadosPorTransicion(+Automata, ?Estados)
-listaEstadosPorTransicion([], []).
-listaEstadosPorTransicion([(S1, _, S2)|Ls], [S1,S2|Es]) :-
-    listaEstadosPorTransicion(Ls, Es).
+% Nota: por estado de transición se entiende estado que no es ni inicial ni final.
 
-estados(a(I, F, T), Ls) :-
-    setof(X,
-          (listaEstadosPorTransicion(T, Y1),
-           append(F, Y1, Y2),
-           append([I], Y2, Y3),
-           member(X, Y3)),
-          Ls).
+% estadosDeTransicion(+Transiciones, ?Estados)
+% Unifica Estados con una lista de los estados que participan en Transiciones
+% (lista de transiciones).
+estadosDeTransicion([], []).
+estadosDeTransicion([(S1, _, S2) | Ts], [S1, S2 | Ss]) :-
+    estadosDeTransicion(Ts, Ss).
+
+estados(A, Estados) :-
+    inicialDe(A, Inicial),
+    finalesDe(A, Finales),
+    transicionesDe(A, T),
+    estadosDeTransicion(T, EstadosDeTransicion),
+    append([Inicial | Finales], EstadosDeTransicion, Estados_),
+    setof(X, member(X, Estados_), Estados).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 3) esCamino(+Automata, ?EstadoInicial, ?EstadoFinal, +Camino)                %
