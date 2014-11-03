@@ -1,4 +1,19 @@
-# Vim
+# Binaries
+informe.pdf
 
+# LaTeX
+*.out
+*.log
+*.aux
+
+# Bundle
+bundle
+*.tar.gz
+
+# Vim
 *.swp
 *.swo
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
