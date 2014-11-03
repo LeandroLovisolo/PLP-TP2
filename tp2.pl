@@ -103,7 +103,7 @@ caminoDeLongitud(A, N, [S1, S2 | Camino], [E | Etiquetas], S1, Sn) :-
 alcanzable(A, E) :- inicialDe(A, I),
                     estados(A, Estados),
                     length(Estados, N),
-                    between(2, N, M),
+                    between(1, N, M),
                     caminoDeLongitud(A, M, _, _, I, E),
                     !.
 
@@ -295,3 +295,10 @@ test(40) :- ejemplo(1, A), not(caminoDeLongitud(A, 2, _, _, sf, s1)).
 test(41) :- ejemplo(5, A), findall((C, E), caminoDeLongitud(A, 3, C, E, s1, s3), Xs), permutation(Xs, [([s1, s1, s3], [a, c]), ([s1, s2, s3], [b, c])]).
 % Caminos de longitud 3 (origen/destino no instanciados).
 test(42) :- ejemplo(5, A), findall((C, E, S1, S2), caminoDeLongitud(A, 3, C, E, S1, S2), Xs), permutation(Xs, [([s1, s1, s1], [a, a], s1, s1), ([s1, s1, s2], [a, b], s1, s2), ([s1, s1, s3], [a, c], s1, s3), ([s1, s2, s3], [b, c], s1, s3)]).
+
+% Ejercicio 6 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Todos los estados de todos los autómatas de ejemplo son alcanzables.
+test(43) :- forall(between(1, 10, N), (ejemplo(N, A), estados(A, Es), forall(member(E, Es), alcanzable(A, E)))).
+% Los automatas de ejemplos malos con estados no alcanzables efectivamente tienen estados no alcanzables.
+test(43) :- forall(between(2, 4, N), (ejemploMalo(N, A), estados(A, Es), member(E, Es), not(alcanzable(A, E)))).
