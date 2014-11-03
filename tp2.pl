@@ -201,7 +201,7 @@ palabrasDeLongitudN(A, Palabras, N) :-
 % Tests                                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 
-numeroDeTests(42).
+numeroDeTests(44).
 tests :- numeroDeTests(N), forall(between(1, N, I), test(I)). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
@@ -299,6 +299,10 @@ test(42) :- ejemplo(5, A), findall((C, E, S1, S2), caminoDeLongitud(A, 3, C, E, 
 % Ejercicio 6 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Todos los estados de todos los autómatas de ejemplo son alcanzables.
-test(43) :- forall(between(1, 10, N), (ejemplo(N, A), estados(A, Es), forall(member(E, Es), alcanzable(A, E)))).
+test(43) :- forall(ejemplo(_, A), (estados(A, Es), forall(member(E, Es), alcanzable(A, E)))).
 % Los automatas de ejemplos malos con estados no alcanzables efectivamente tienen estados no alcanzables.
-test(43) :- forall(between(2, 4, N), (ejemploMalo(N, A), estados(A, Es), member(E, Es), not(alcanzable(A, E)))).
+test(44) :- forall(between(2, 4, N), (ejemploMalo(N, A), estados(A, Es), member(E, Es), not(alcanzable(A, E)))).
+
+% Ejercicio 7 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
