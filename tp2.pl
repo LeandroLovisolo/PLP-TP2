@@ -76,17 +76,14 @@ estados(a(I, F, T), Ls) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %hayTransicion(+T, +E1, +E2) Verdadero si hay una transicion
-hayTransicion(T, E1, E2) :- member((E1, _, E2), T).
+hayTransicion(A, E1, E2) :- transicionesDe(A, T),
+                            member((E1, _, E2), T).
 
 %Si hay ciclos, no funciona la reversibilidad
-esCamino(A, S, S, [S]) :- transicionesDe(A, T),
-                          hayTransicion(T, S, S).
-esCamino(A, S, F, [S, F]) :- transicionesDe(A, T),
-                             hayTransicion(T, S, F),
-                             !.
-esCamino(A, S, F, [S, L2 | Ls]) :- transicionesDe(A, T),
-                                   hayTransicion(T, S, L2),
-                                   esCamino(A, L2, F, [L2|Ls]).
+esCamino(A, S, S, [S]) :- hayTransicion(A, S, S).
+esCamino(A, S, F, [S, F]) :- hayTransicion(A, S, F), !.
+esCamino(A, S, F, [S, L2 | Ls]) :- hayTransicion(A, S, L2),
+                                   esCamino(A, L2, F, [L2 | Ls]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 4) ¿el predicado anterior es o no reversible con respecto a Camino y por qué?%
