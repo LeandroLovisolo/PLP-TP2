@@ -293,7 +293,7 @@ test(29) :- ejemplo(1, A), esCamino(A, s1, sf, [s1, sf]).
 % Camino de longitud 2 inválido (origen/destino invertidos, camino invertido).
 test(30) :- ejemplo(1, A), not(esCamino(A, sf, s1, [sf, s1])). 
 % Camino de longitud 2 inválido (origen/destino invertidos, camino correcto).
-test(31) :- ejemplo(1, A), not(esCamino(A, sf, s1, [sf, s1])). 
+test(31) :- ejemplo(1, A), not(esCamino(A, sf, s1, [s1, sf])). 
 % Camino de longitud 2 inválido (origen/destino correctos, camino invertido).
 test(32) :- ejemplo(1, A), not(esCamino(A, s1, sf, [sf, s1])). 
 % Camino de longitud 7 (origen/destino no instanciados - palabra "prolog").
