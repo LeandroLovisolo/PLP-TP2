@@ -228,20 +228,26 @@ hayCiclo(A) :- estados(A, Estados),
 % 9) reconoce(+Automata, ?Palabra)                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+% longitudCamino(+Automata, ?Palabra, -N)
+% Unifica N con la longitud de Palabra en caso que estuviera instanciada o semi-
+% instanciada (ej.: [h,X,l,a]), o genera las posibles longitudes de palabra en
+% caso que no estuviera instanciada.
 longitudCamino(_, Palabra, N) :- nonvar(Palabra), length(Palabra, M), N is M + 1.
 longitudCamino(A, Palabra, N) :- var(Palabra), hayCiclo(A), desde(1, N).
 longitudCamino(A, Palabra, N) :- var(Palabra), not(hayCiclo(A)),
                                  estados(A, Estados),
                                  length(Estados, NE),
                                  between(1, NE, N).
-reconoceUna(A, Palabra) :- inicialDe(A, Inicial),
-                           finalesDe(A, Finales),
-                           longitudCamino(A, Palabra, N),
-                           member(Final, Finales),
-                           caminoDeLongitud(A, N, _, Palabra, Inicial, Final).
-reconoce(A, Palabra) :- ground(Palabra), reconoceUna(A, Palabra), !.
-reconoce(A, Palabra) :- not(ground(Palabra)), reconoceUna(A, Palabra).
+
+% reconoce_(+Automata, ?Palabra)                                 
+reconoce_(A, Palabra) :- inicialDe(A, Inicial),
+                         finalesDe(A, Finales),
+                         longitudCamino(A, Palabra, N),
+                         member(Final, Finales),
+                         caminoDeLongitud(A, N, _, Palabra, Inicial, Final).
+
+reconoce(A, Palabra) :- ground(Palabra), reconoce_(A, Palabra), !.
+reconoce(A, Palabra) :- not(ground(Palabra)), reconoce_(A, Palabra).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 10) PalabraMásCorta(+Automata, ?Palabra)                                     %  
