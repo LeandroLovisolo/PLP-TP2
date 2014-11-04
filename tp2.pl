@@ -270,7 +270,20 @@ longitudCamino(A, Palabra, N) :- var(Palabra), not(hayCiclo(A)),
                                  length(Estados, NE),
                                  between(1, NE, N).
 
-% reconoce(+Automata, ?Palabra)                                 
+% Sobre generate and test
+% -----------------------
+% 
+% El esquema no es exactamente generate and test, porque no estamos generando
+% soluciones candidatas y luego testeando cada candidato uno por uno, sino que:
+%
+% - Generamos candidatos a estados finales y longitudes de caminos asociados
+%   a palabras, o fijando una longitud en caso de conocerla previamente.
+% - Testeamos si existe un camino de la longitud actual que empieza en el estado
+%   inicial y termina en el estado final actual.
+%
+% El test tiene la particularidad de construir tal camino en caso de tener
+% éxito. Se obtiene una solución extrayendo la lista de etiquetas asociada al
+% camino construido.
 reconoce(A, Palabra) :- inicialDe(A, Inicial),
                         finalesDe(A, Finales),
                         longitudCamino(A, Palabra, N),
