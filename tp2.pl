@@ -76,13 +76,15 @@ estados(A, Estados) :-
 % 3) esCamino(+Automata, ?EstadoInicial, ?EstadoFinal, +Camino)                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% hayTransicion(+A, +S1, +S2). Se verifica si el autómata A tiene una transición
-% entre los estados S1 y S2.
+% hayTransicion(+A, +S1, +S2)
+% Se verifica si el autómata A tiene una transición entre los estados S1 y S2.
 hayTransicion(A, S1, S2) :- transicionesDe(A, T),
                             member((S1, _, S2), T).
 
-%Si hay ciclos, no funciona la reversibilidad
+% Caminos de longitud 1.
 esCamino(A, S, S, [S]) :- hayTransicion(A, S, S).
+
+% Caminos de longitud >= 2.
 esCamino(A, S, F, [S, F]) :- hayTransicion(A, S, F).
 esCamino(A, S1, Sn, [S1, S2 | Ss]) :- hayTransicion(A, S1, S2),
                                       esCamino(A, S2, Sn, [S2 | Ss]).
@@ -91,10 +93,44 @@ esCamino(A, S1, Sn, [S1, S2 | Ss]) :- hayTransicion(A, S1, S2),
 % 4) ¿el predicado anterior es o no reversible con respecto a Camino y por qué?%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% No es reversible. El predicado actual tiene un corte en la segunda regla que
-% hace que sólo se devuelva un resultado, perdiéndose los restantes al intentar usar Camino
-% como -Camino. Si se removiera el !, los automatas con ciclos no devuelven todos
-% los caminos posibles, el camino entra en el ciclo indefinidamente.
+% No es reversible.
+%
+% En el caso que el autómata tuviera ciclos, podría ocurrir lo siguiente:
+% 
+% 1. Se unifica Camino con un camino que posee un ciclo.
+% 2. Se hace backtracking hasta el goal asociado al término
+%    hayTransición(A, S1, S2) en el que terminaba el ciclo del camino anterior.
+% 3. Se resatisface dicho goal con valores para S1 y S2 tales que se realiza
+%    otra "vuelta" por el mismo ciclo.
+% 4. El intérprete continúa igual que en el camino original hasta unificar
+%    Camino con un camino que posee dos ciclos.
+% 5. Se vuelve al paso 2.
+%
+% En cada iteración se le agrega una nueva vuelta por el mismo ciclo al camino
+% con el que se unifica la variable Camino, y nunca se sale de esta rama de
+% ejecución. Si hubieran otros caminos entre EstadoInicial y EstadoFinal a los
+% que se pudiera llegar evitando el ciclo, el predicado nunca los alcanzaría.
+%
+% Luego esCamino/4 no es reversible, pues no siempre unifica Camino con todos
+% los caminos posibles entre EstadoInicial y EstadoFinal.
+%
+% Ejemplo concreto:
+%
+%   ?- ejemplo(5, A), esCamino(A, s1, s3, Camino).
+%   A = a(s1, [s2, s3], [ (s1, a, s1), (s1, b, s2), (s1, c, s3), (s2, c, s3)]),
+%   Camino = [s1, s3] ;
+%   A = a(s1, [s2, s3], [ (s1, a, s1), (s1, b, s2), (s1, c, s3), (s2, c, s3)]),
+%   Camino = [s1, s1, s3] ;
+%   A = a(s1, [s2, s3], [ (s1, a, s1), (s1, b, s2), (s1, c, s3), (s2, c, s3)]),
+%   Camino = [s1, s1, s1, s3] ;
+%   A = a(s1, [s2, s3], [ (s1, a, s1), (s1, b, s2), (s1, c, s3), (s2, c, s3)]),
+%   Camino = [s1, s1, s1, s1, s3] ;
+%   A = a(s1, [s2, s3], [ (s1, a, s1), (s1, b, s2), (s1, c, s3), (s2, c, s3)]),
+%   Camino = [s1, s1, s1, s1, s1, s3] 
+%   ...
+%
+% Observar que el predicado unifica Camino con caminos de la forma 
+% [s1, ..., s1, s3] pero nunca con caminos de la forma [s1, ..., s1, s2, s3].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 5) caminoDeLongitud(+Automata, +N, -Camino, -Etiquetas, ?S1, ?S2)            %
