@@ -282,8 +282,8 @@ longitudCamino(A, Palabra, N) :- var(Palabra), not(hayCiclo(A)),
 %   inicial y termina en el estado final actual.
 %
 % El test tiene la particularidad de construir tal camino en caso de tener
-% éxito. Se obtiene una solución extrayendo la lista de etiquetas asociada al
-% camino construido.
+% éxito. En ese caso se obtiene una solución extrayendo la lista de etiquetas
+% asociada al camino construido.
 reconoce(A, Palabra) :- inicialDe(A, Inicial),
                         finalesDe(A, Finales),
                         longitudCamino(A, Palabra, N),
@@ -300,6 +300,20 @@ reconoce(A, Palabra) :- inicialDe(A, Inicial),
 palabrasDeLongitudN(A, Palabras, N) :-
         findall(P, (length(P, N), reconoce(A, P)), Palabras).
 
+% Sobre generate and test
+% -----------------------
+% 
+% El esquema no es exactamente generate and test, porque no estamos generando
+% soluciones candidatas y luego testeando cada candidato uno por uno, sino que:
+%
+% - Generamos una lista de palabras aceptadas por el autómata para cada longitud
+%   de palabra N, en orden ascendente.
+% - Testeamos si la lista de palabras obtenida es no-vacía.
+%
+% Al hallar la primera lista de palabras no-vacía, el predicado construye una
+% solución unificando la palabra P con alguna palabra de la lista de forma no-
+% determinísitca en caso de no estar instanciada, o verifica que la palabra esté
+% incluida en la lista en caso de estar instanciada.
 palabraMasCorta(A, P) :- desde(0, N),
                          palabrasDeLongitudN(A, Palabras, N),
                          Palabras \= [],
