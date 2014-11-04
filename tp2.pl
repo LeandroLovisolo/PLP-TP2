@@ -253,23 +253,17 @@ reconoce(A, Palabra) :- not(ground(Palabra)), reconoce_(A, Palabra).
 % 10) PalabraMásCorta(+Automata, ?Palabra)                                     %  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% La primera vez que reconozca una palabra, tira los resultados posibles para esa palabra
-% Parece que el redo hace las cosas 4 veces. Hay resultados repetidos
-palabraMasCorta(A, P) :- desde(0, Y),
-                         length(P, Y),
-                         length(X, Y),
-                         reconoce(A, X),
-                         !,
-                         reconoce(A, P).
+% palabrasDeLongitudN(+Automata, ?Palabras, +N)
+% Unifica Palabras con una lista de todas las palabras de longitud N aceptadas
+% por el autómata.
+palabrasDeLongitudN(A, Palabras, N) :-
+        findall(P, (length(P, N), reconoce(A, P)), Palabras).
 
 palabraMasCorta(A, P) :- desde(0, N),
                          palabrasDeLongitudN(A, Palabras, N),
                          Palabras \= [],
                          !,
                          member(P, Palabras).
-palabrasDeLongitudN(A, Palabras, N) :-
-        findall(P, (length(P, N), reconoce(A, P)), Palabras).
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 % Tests                                                                        %
