@@ -167,6 +167,8 @@ caminoDeLongitud(A, N, [S1, S2 | Camino], [E | Etiquetas], S1, Sn) :-
 % - Testeamos cada espacio de búsqueda decidiendo si contiene una solución;
 %   es decir, un camino desde el estado inicial hasta el estado E de la longitud
 %   correspondiente al espacio de búsqueda actual.
+%
+% El predicado se satisface si se descubre algún camino en la parte "test".
 alcanzable(A, E) :- inicialDe(A, I),
                     estados(A, Estados),
                     length(Estados, N),
