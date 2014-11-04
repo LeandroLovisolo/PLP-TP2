@@ -214,7 +214,8 @@ automataValido(A) :- todoEstadoNoFinalTieneTransicionesSalientes(A),
 % 8) hayCiclo(+Automata)                                                       %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Corto porque al encontrar un camino que sale y entra del mismo nodo, ya hay un ciclo.
+% Se corta luego de encontrar el primer ciclo para evitar recorrer el resto del
+% espacio de búsqueda innecesariamente.
 hayCiclo(A) :- estados(A, Estados),
                length(Estados, N),
                member(E, Estados),
