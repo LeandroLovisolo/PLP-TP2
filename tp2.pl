@@ -230,6 +230,21 @@ automataValido(A) :- todoEstadoNoFinalTieneTransicionesSalientes(A),
 
 % Se corta luego de encontrar el primer ciclo para evitar recorrer el resto del
 % espacio de búsqueda innecesariamente.
+%
+% Sobre generate and test
+% -----------------------
+% 
+% El esquema no es exactamente generate and test, porque no estamos generando
+% soluciones candidatas y luego testeando cada candidato uno por uno, sino que:
+%
+% - Generamos distintas "descripciones" de ciclos posibles, compuestas de
+%   un estado E donde comienza/termina el ciclo y una longitud N.
+% - Testeamos cada descripción buscando un camino que cumpla con la descripción,
+%   es decir, decidiendo si existe un camino de longitud N que empiece y termine
+%   en el estado E.
+%
+% El predicado se satisface si se encuentra un camino en la parte "test" que
+% satisfaga una descripción generada en la parte "generate".
 hayCiclo(A) :- estados(A, Estados),
                length(Estados, N),
                member(E, Estados),
