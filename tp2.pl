@@ -136,8 +136,9 @@ esCamino(A, S1, Sn, [S1, S2 | Ss]) :- hayTransicion(A, S1, S2),
 % 5) caminoDeLongitud(+Automata, +N, -Camino, -Etiquetas, ?S1, ?S2)            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Devuelve etiqueta y estado al que es posible moverse desde ese estado
-% transicionesPosibles(+T, +E1, -E2, -Et)
+% transicionesPosibles(+T, +S1, -S2, -E)
+% Toma una lista de transiciones T y un estado S1 y unifica S2 y E con
+% un estado S2 alcanzable desde S1 por medio de la etiqueta E.
 transicionesPosibles(T, S1, S2, E) :- member((S1, E, S2), T).
 
 caminoDeLongitud(A, 1, [S], [], S, S) :- estados(A, E), member(S, E).
@@ -163,34 +164,42 @@ alcanzable(A, E) :- inicialDe(A, I),
 % 7) automataValido(+Automata)                                                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% estadosNoFinales(+Automata, ?EstadosNoFinales)
 estadosNoFinales(A, EstadosNoFinales) :- 
     estados(A, Estados),
     finalesDe(A, EstadosFinales),
     subtract(Estados, EstadosFinales, EstadosNoFinales).
 
+% todoEstadoNoFinalTieneTransicionesSalientes(+Automata)
 todoEstadoNoFinalTieneTransicionesSalientes(A) :- 
      estadosNoFinales(A, EstadosNoFinales),
      transicionesDe(A, T),
      forall(member(E, EstadosNoFinales),
             transicionesPosibles(T, E, _, _)).
 
+% estadosNoIniciales(+Automata, ?EstadosNoIniciales)
 estadosNoIniciales(A, EstadosNoIniciales) :- 
      estados(A, Estados),
      inicialDe(A, Inicial),
      subtract(Estados, [Inicial], EstadosNoIniciales).
 
+% todoEstadoEsAlcanzableDesdeElInicial(+Automata)
 todoEstadoEsAlcanzableDesdeElInicial(A) :-
       estadosNoIniciales(A, EstadosNoIniciales),
       forall(member(E, EstadosNoIniciales),
              alcanzable(A, E)).
-                                          
+
+% tieneEstadosFinales(+Automata)            
 tieneEstadosFinales(A) :- finalesDe(A, Finales), Finales \= [].
 
+% noTieneRepetidos(+Lista)
 noTieneRepetidos([]).
 noTieneRepetidos([X | XS]) :- forall(member(Y, XS), X \= Y), noTieneRepetidos(XS).
 
+% noHayEstadosFinalesRepetidos(+Automata)
 noHayEstadosFinalesRepetidos(A) :- finalesDe(A, F), noTieneRepetidos(F).
 
+% noHayTransicionesRepetidas(+Automata)
 noHayTransicionesRepetidas(A) :- transicionesDe(A, T), noTieneRepetidos(T).
 
 automataValido(A) :- todoEstadoNoFinalTieneTransicionesSalientes(A),
@@ -217,6 +226,7 @@ hayCiclo(A) :- estados(A, Estados),
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 9) reconoce(+Automata, ?Palabra)                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 longitudCamino(_, Palabra, N) :- nonvar(Palabra), length(Palabra, M), N is M + 1.
 longitudCamino(A, Palabra, N) :- var(Palabra), hayCiclo(A), desde(1, N).
