@@ -239,15 +239,12 @@ longitudCamino(A, Palabra, N) :- var(Palabra), not(hayCiclo(A)),
                                  length(Estados, NE),
                                  between(1, NE, N).
 
-% reconoce_(+Automata, ?Palabra)                                 
-reconoce_(A, Palabra) :- inicialDe(A, Inicial),
-                         finalesDe(A, Finales),
-                         longitudCamino(A, Palabra, N),
-                         member(Final, Finales),
-                         caminoDeLongitud(A, N, _, Palabra, Inicial, Final).
-
-reconoce(A, Palabra) :- ground(Palabra), reconoce_(A, Palabra), !.
-reconoce(A, Palabra) :- not(ground(Palabra)), reconoce_(A, Palabra).
+% reconoce(+Automata, ?Palabra)                                 
+reconoce(A, Palabra) :- inicialDe(A, Inicial),
+                        finalesDe(A, Finales),
+                        longitudCamino(A, Palabra, N),
+                        member(Final, Finales),
+                        caminoDeLongitud(A, N, _, Palabra, Inicial, Final).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 10) PalabraMásCorta(+Automata, ?Palabra)                                     %  
