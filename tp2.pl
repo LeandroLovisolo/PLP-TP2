@@ -155,6 +155,18 @@ caminoDeLongitud(A, N, [S1, S2 | Camino], [E | Etiquetas], S1, Sn) :-
 
 % Se corta luego de encontrar el primer camino hasta el estado E para evitar
 % recorrer el resto del espacio de búsqueda innecesariamente.
+%
+% Sobre generate and test
+% -----------------------
+% 
+% El esquema no es exactamente generate and test, porque no estamos generando
+% soluciones candidatas y luego testeando cada candidato uno por uno, sino que:
+%
+% - Generamos distintos espacios de búsqueda, uno para cada longitud de camino
+%   posible.
+% - Testeamos cada espacio de búsqueda decidiendo si contiene una solución;
+%   es decir, un camino desde el estado inicial hasta el estado E de la longitud
+%   correspondiente al espacio de búsqueda actual.
 alcanzable(A, E) :- inicialDe(A, I),
                     estados(A, Estados),
                     length(Estados, N),
