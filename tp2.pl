@@ -153,6 +153,8 @@ caminoDeLongitud(A, N, [S1, S2 | Camino], [E | Etiquetas], S1, Sn) :-
 % 6) alcanzable(+Automata, +Estado)                                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Se corta luego de encontrar el primer camino hasta el estado E para evitar
+% recorrer el resto del espacio de búsqueda innecesariamente.
 alcanzable(A, E) :- inicialDe(A, I),
                     estados(A, Estados),
                     length(Estados, N),
