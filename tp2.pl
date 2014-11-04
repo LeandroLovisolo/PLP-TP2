@@ -45,7 +45,7 @@ desde(X, Y):-desde(X, Z),  Y is Z + 1.
 
 % transcionesSonDeterministicas(+Transiciones)
 transcionesSonDeterministicas([]).
-transcionesSonDeterministicas([(S, E, _) | Ts]) :- 
+transcionesSonDeterministicas([(S, E, _) | Ts]) :-
      forall(member(T, Ts), T \= (S, E, _)),
      transcionesSonDeterministicas(Ts).
 
@@ -96,7 +96,7 @@ esCamino(A, S1, Sn, [S1, S2 | Ss]) :- hayTransicion(A, S1, S2),
 % No es reversible.
 %
 % En el caso que el autómata tuviera ciclos, podría ocurrir lo siguiente:
-% 
+%
 % 1. Se unifica Camino con un camino que posee un ciclo.
 % 2. Se hace backtracking hasta el goal asociado al término
 %    hayTransición(A, S1, S2) en el que terminaba el ciclo del camino anterior.
@@ -126,10 +126,10 @@ esCamino(A, S1, Sn, [S1, S2 | Ss]) :- hayTransicion(A, S1, S2),
 %   A = a(s1, [s2, s3], [ (s1, a, s1), (s1, b, s2), (s1, c, s3), (s2, c, s3)]),
 %   Camino = [s1, s1, s1, s1, s3] ;
 %   A = a(s1, [s2, s3], [ (s1, a, s1), (s1, b, s2), (s1, c, s3), (s2, c, s3)]),
-%   Camino = [s1, s1, s1, s1, s1, s3] 
+%   Camino = [s1, s1, s1, s1, s1, s3]
 %   ...
 %
-% Observar que el predicado unifica Camino con caminos de la forma 
+% Observar que el predicado unifica Camino con caminos de la forma
 % [s1, ..., s1, s3] pero nunca con caminos de la forma [s1, ..., s1, s2, s3].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -142,8 +142,8 @@ esCamino(A, S1, Sn, [S1, S2 | Ss]) :- hayTransicion(A, S1, S2),
 transicionesPosibles(T, S1, S2, E) :- member((S1, E, S2), T).
 
 caminoDeLongitud(A, 1, [S], [], S, S) :- estados(A, E), member(S, E).
-caminoDeLongitud(A, N, [S1, S2 | Camino], [E | Etiquetas], S1, Sn) :- 
-    N >= 2,                                                   
+caminoDeLongitud(A, N, [S1, S2 | Camino], [E | Etiquetas], S1, Sn) :-
+    N >= 2,
     transicionesDe(A, T),
     transicionesPosibles(T, S1, S2, E),
     M is N - 1,
@@ -158,7 +158,7 @@ caminoDeLongitud(A, N, [S1, S2 | Camino], [E | Etiquetas], S1, Sn) :-
 %
 % Sobre generate and test
 % -----------------------
-% 
+%
 % El esquema no es exactamente generate and test, porque no estamos generando
 % soluciones candidatas y luego testeando cada candidato uno por uno, sino que:
 %
@@ -181,20 +181,20 @@ alcanzable(A, E) :- inicialDe(A, I),
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % estadosNoFinales(+Automata, ?EstadosNoFinales)
-estadosNoFinales(A, EstadosNoFinales) :- 
+estadosNoFinales(A, EstadosNoFinales) :-
     estados(A, Estados),
     finalesDe(A, EstadosFinales),
     subtract(Estados, EstadosFinales, EstadosNoFinales).
 
 % todoEstadoNoFinalTieneTransicionesSalientes(+Automata)
-todoEstadoNoFinalTieneTransicionesSalientes(A) :- 
+todoEstadoNoFinalTieneTransicionesSalientes(A) :-
      estadosNoFinales(A, EstadosNoFinales),
      transicionesDe(A, T),
      forall(member(E, EstadosNoFinales),
             transicionesPosibles(T, E, _, _)).
 
 % estadosNoIniciales(+Automata, ?EstadosNoIniciales)
-estadosNoIniciales(A, EstadosNoIniciales) :- 
+estadosNoIniciales(A, EstadosNoIniciales) :-
      estados(A, Estados),
      inicialDe(A, Inicial),
      subtract(Estados, [Inicial], EstadosNoIniciales).
@@ -205,7 +205,7 @@ todoEstadoEsAlcanzableDesdeElInicial(A) :-
       forall(member(E, EstadosNoIniciales),
              alcanzable(A, E)).
 
-% tieneEstadosFinales(+Automata)            
+% tieneEstadosFinales(+Automata)
 tieneEstadosFinales(A) :- finalesDe(A, Finales), Finales \= [].
 
 % noTieneRepetidos(+Lista)
@@ -235,7 +235,7 @@ automataValido(A) :- todoEstadoNoFinalTieneTransicionesSalientes(A),
 %
 % Sobre generate and test
 % -----------------------
-% 
+%
 % El esquema no es exactamente generate and test, porque no estamos generando
 % soluciones candidatas y luego testeando cada candidato uno por uno, sino que:
 %
@@ -272,7 +272,7 @@ longitudCamino(A, Palabra, N) :- var(Palabra), not(hayCiclo(A)),
 
 % Sobre generate and test
 % -----------------------
-% 
+%
 % El esquema no es exactamente generate and test, porque no estamos generando
 % soluciones candidatas y luego testeando cada candidato uno por uno, sino que:
 %
@@ -291,12 +291,12 @@ reconoce(A, Palabra) :- inicialDe(A, Inicial),
                         caminoDeLongitud(A, N, _, Palabra, Inicial, Final).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 10) palabraMásCorta(+Automata, ?Palabra)                                     %  
+% 10) palabraMásCorta(+Automata, ?Palabra)                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Sobre generate and test
 % -----------------------
-% 
+%
 % El esquema no es exactamente generate and test, porque no estamos generando
 % soluciones candidatas y luego testeando cada candidato uno por uno, sino que:
 %
@@ -314,16 +314,16 @@ palabraMasCorta(A, P) :- desde(0, N),
                          !,
                          reconoce(A, P).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Tests                                                                        %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 numeroDeTests(44).
-tests :- numeroDeTests(N), forall(between(1, N, I), test(I)). 
+tests :- numeroDeTests(N), forall(between(1, N, I), test(I)).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Tests provistos por la cátedra                                               %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 test(1)  :- forall(ejemplo(_, A),  automataValido(A)).
 test(2)  :- not((ejemploMalo(_, A),  automataValido(A))).
@@ -374,7 +374,7 @@ test(23) :- ejemplo(3, A), estados(A, Xs), Xs = [si].
 % Más de un estado final, sin estados de transición.
 test(24) :- ejemplo(4, A), estados(A, Xs), permutation(Xs, [s1, s2, s3]).
 % Un estado final, un estado de transición.
-test(25) :- ejemplo(6, A), estados(A, Xs), permutation(Xs, [s1, s2, s3]). 
+test(25) :- ejemplo(6, A), estados(A, Xs), permutation(Xs, [s1, s2, s3]).
 % Más de un estado final, más de un estado de transición.
 test(26) :- ejemplo(10, A), estados(A, Xs),
             permutation(Xs, [s1, s2, s3, s4, s5, s6, s7, s8,
@@ -383,17 +383,17 @@ test(26) :- ejemplo(10, A), estados(A, Xs),
 % Ejercicio 3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Camino de longitud 0 (inválido).
-test(27) :- ejemplo(1, A), not(esCamino(A, s1, s1, [])). 
+test(27) :- ejemplo(1, A), not(esCamino(A, s1, s1, [])).
 % Camino de longitud 1 (ciclo a sí mismo).
-test(28) :- ejemplo(2, A), esCamino(A, si, si, [si]). 
+test(28) :- ejemplo(2, A), esCamino(A, si, si, [si]).
 % Camino de longitud 2.
-test(29) :- ejemplo(1, A), esCamino(A, s1, sf, [s1, sf]). 
+test(29) :- ejemplo(1, A), esCamino(A, s1, sf, [s1, sf]).
 % Camino de longitud 2 inválido (origen/destino invertidos, camino invertido).
-test(30) :- ejemplo(1, A), not(esCamino(A, sf, s1, [sf, s1])). 
+test(30) :- ejemplo(1, A), not(esCamino(A, sf, s1, [sf, s1])).
 % Camino de longitud 2 inválido (origen/destino invertidos, camino correcto).
-test(31) :- ejemplo(1, A), not(esCamino(A, sf, s1, [s1, sf])). 
+test(31) :- ejemplo(1, A), not(esCamino(A, sf, s1, [s1, sf])).
 % Camino de longitud 2 inválido (origen/destino correctos, camino invertido).
-test(32) :- ejemplo(1, A), not(esCamino(A, s1, sf, [sf, s1])). 
+test(32) :- ejemplo(1, A), not(esCamino(A, s1, sf, [sf, s1])).
 % Camino de longitud 7 (origen/destino no instanciados - palabra "prolog").
 test(33) :- ejemplo(10, A), esCamino(A, S1, S2, [s1, s2, s12, s13, s14, s15, s11]),
             S1 = s1, S2 = s11.
@@ -412,7 +412,7 @@ test(37) :- ejemplo(1, A), findall((C, E, S1, S2),
                                    Xs),
             permutation(Xs, [([s1], [], s1, s1), ([sf], [], sf, sf)]).
 % Camino de longitud 2 válido (origen/destino instanciados).
-test(38) :- ejemplo(1, A), caminoDeLongitud(A, 2, C, E, s1, sf), C = [s1, sf], E = [a]. 
+test(38) :- ejemplo(1, A), caminoDeLongitud(A, 2, C, E, s1, sf), C = [s1, sf], E = [a].
 % Camino de longitud 2 válido (origen/destino no instanciados).
 test(39) :- ejemplo(1, A), caminoDeLongitud(A, 2, C, E, S1, S2),
             C = [s1, sf], E = [a], S1 = s1, S2 = sf.
