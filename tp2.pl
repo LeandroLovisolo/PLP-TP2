@@ -291,14 +291,8 @@ reconoce(A, Palabra) :- inicialDe(A, Inicial),
                         caminoDeLongitud(A, N, _, Palabra, Inicial, Final).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 10) PalabraMásCorta(+Automata, ?Palabra)                                     %  
+% 10) palabraMásCorta(+Automata, ?Palabra)                                     %  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% palabrasDeLongitudN(+Automata, ?Palabras, +N)
-% Unifica Palabras con una lista de todas las palabras de longitud N aceptadas
-% por el autómata.
-palabrasDeLongitudN(A, Palabras, N) :-
-        findall(P, (length(P, N), reconoce(A, P)), Palabras).
 
 % Sobre generate and test
 % -----------------------
@@ -306,19 +300,19 @@ palabrasDeLongitudN(A, Palabras, N) :-
 % El esquema no es exactamente generate and test, porque no estamos generando
 % soluciones candidatas y luego testeando cada candidato uno por uno, sino que:
 %
-% - Generamos una lista de palabras aceptadas por el autómata para cada longitud
-%   de palabra N, en orden ascendente.
-% - Testeamos si la lista de palabras obtenida es no-vacía.
+% - Generamos candidatos a longitudes de palabra mínima en orden ascendente.
+% - Testeamos si el autómata reconoce alguna palabra de ésa longitud.
 %
-% Al hallar la primera lista de palabras no-vacía, el predicado construye una
-% solución unificando la palabra P con alguna palabra de la lista de forma no-
-% determinísitca en caso de no estar instanciada, o verifica que la palabra esté
-% incluida en la lista en caso de estar instanciada.
+% En caso de reconocerse alguna, se produce un corte y se unifica P con todas
+% las palabras de la longitud actual (la mínima). El corte evita que se unifique
+% P con palabras de mayor longitud una vez que se agotan las palabras de
+% longitud mínima.
 palabraMasCorta(A, P) :- desde(0, N),
-                         palabrasDeLongitudN(A, Palabras, N),
-                         Palabras \= [],
+                         length(P, N),
+                         length(Q, N),
+                         reconoce(A, Q),
                          !,
-                         member(P, Palabras).
+                         reconoce(A, P).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 % Tests                                                                        %
